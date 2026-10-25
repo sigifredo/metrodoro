@@ -1,6 +1,6 @@
 /* =========================================================================
  * Tema del metrónomo (imusic-school): fondo #202020, texto #F9F9F9,
- * acento #FA5E46, gris de controles #889299.
+ * acento #2196F3, gris de controles #889299.
  * ========================================================================= */
 
 MainWindow {
@@ -13,7 +13,7 @@ QLabel, QCheckBox {
 }
 
 QLabel#bpm {
-    color: #FA5E46;
+    color: #2196F3;
     font-size: 112px;
     font-weight: 800;
 }
@@ -44,8 +44,8 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:checked {
-    border-color: #FA5E46;
-    background: #FA5E46;
+    border-color: #2196F3;
+    background: #2196F3;
 }
 
 QSlider::groove:horizontal {
@@ -58,12 +58,12 @@ QSlider::handle:horizontal {
     height: 20px;
     margin: -9px 0;
     border-radius: 10px;
-    background: #FA5E46;
+    background: #2196F3;
 }
 
 QPushButton#tap {
     background: #FFFFFF;
-    color: #FA5E46;
+    color: #2196F3;
     border: 1px solid #D9E4E6;
     border-radius: 5px;
     font-size: 20px;
@@ -82,7 +82,7 @@ QToolButton#noteButton {
 
 QToolButton#noteButton:hover,
 QToolButton#noteButton[state="set"] {
-    background: #FA5E46;
+    background: #2196F3;
 }
 
 QToolButton#noteButton[state="active"] {
@@ -93,4 +93,43 @@ QFrame#separator {
     color: rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.2);
     max-height: 1px;
+}
+
+QLabel#phase {
+    font-size: 12px;
+    font-weight: 600;
+    min-height: 16px;
+}
+
+QLabel#phase[rest="true"] {
+    color: #6FCF97;
+}
+
+QLabel#countdown {
+    color: #2196F3;
+    font-size: 44px;
+    font-weight: 800;
+}
+
+QLabel:disabled, QCheckBox:disabled {
+    color: #889299;
+}
+
+QLabel#countdown:disabled {
+    color: #889299;
+}
+
+QComboBox {
+    background: #889299;
+    color: #202020;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 10px;
+    min-width: 110px;
+    font-size: 12px;
+}
+
+QComboBox:disabled {
+    background: #3a3a3a;
+    color: #889299;
 }

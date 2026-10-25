@@ -6,6 +6,7 @@ include/NoteSelectorWidget.hpp
 include/RepeatButton.hpp
 include/BeatDotsWidget.hpp
 include/PlayButton.hpp
+include/PracticeSession.hpp
 )
 
 set(SRCS
@@ -16,6 +17,7 @@ src/NoteSelectorWidget.cpp
 src/RepeatButton.cpp
 src/BeatDotsWidget.cpp
 src/PlayButton.cpp
+src/PracticeSession.cpp
 )
 
 # Icono de la aplicación (macOS: .icns dentro del bundle; Windows: .ico vía .rc)

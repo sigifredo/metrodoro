@@ -69,9 +69,6 @@ MetronomeEngine::MetronomeEngine(QObject *parent)
                 else if (repeatCount_ == 20)
                     repeatTimer_.setInterval(kRepeatFastMs);
             });
-
-    countdownTimer_.setInterval(1000);
-    connect(&countdownTimer_, &QTimer::timeout, this, &MetronomeEngine::onTimerTick);
 }
 
 MetronomeEngine::~MetronomeEngine()
@@ -194,8 +191,6 @@ void MetronomeEngine::play()
 {
     generator_->restart();
     sink_->start(generator_.get());
-    if (timerActive_)
-        startTimer();
     started_ = true;
     playing_ = true;
     emit playingChanged(true);
@@ -211,12 +206,6 @@ void MetronomeEngine::resume()
 
 void MetronomeEngine::pause()
 {
-    if (timerActive_)
-    {
-        stop();
-        return;
-    }
-    stopTimer(false);
     sink_->stop();
     playing_ = false;
     emit playingChanged(false);
@@ -225,7 +214,6 @@ void MetronomeEngine::pause()
 void MetronomeEngine::stop()
 {
     sink_->stop();
-    stopTimer(true);
     started_ = false;
     playing_ = false;
     currentBeat_ = -1;
@@ -244,50 +232,4 @@ void MetronomeEngine::restartIfRunning()
     {
         stop();
     }
-}
-
-/* ---- Temporizador -------------------------------------------------------- */
-
-void MetronomeEngine::setTimerActive(bool active)
-{
-    timerActive_ = active;
-    stop();
-    emit timerChanged();
-}
-
-void MetronomeEngine::changeCountdown(int deltaSeconds)
-{
-    timerActive_ = true;
-    if ((timerSeconds_ > 60 && deltaSeconds < 0) || deltaSeconds > 0)
-        timerSeconds_ += deltaSeconds;
-    timerRemaining_ = timerSeconds_;
-    startTimer();
-}
-
-void MetronomeEngine::startTimer()
-{
-    countdownTimer_.start();
-    emit timerChanged();
-}
-
-void MetronomeEngine::stopTimer(bool reset)
-{
-    countdownTimer_.stop();
-    if (reset)
-        timerRemaining_ = timerSeconds_;
-    emit timerChanged();
-}
-
-void MetronomeEngine::onTimerTick()
-{
-    if (--timerRemaining_ > 0)
-    {
-        emit timerChanged();
-        return;
-    }
-    timerRemaining_ = 0;
-    countdownTimer_.stop();
-    emit timerChanged();
-    if (timerActive_)
-        stop();
 }

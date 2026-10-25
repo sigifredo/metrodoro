@@ -12,7 +12,7 @@ class ClickGenerator;
 class QAudioSink;
 
 /**
- * Estado y reglas del metrónomo (BPM, compás, subdivisión, TAP, temporizador)
+ * Estado y reglas del metrónomo (BPM, compás, subdivisión, TAP)
  * más el control de reproducción. Equivale al `metronome` directive del web.
  */
 class MetronomeEngine : public QObject
@@ -33,8 +33,6 @@ public:
     bool accentFirstBeat() const { return accentFirst_; }
     bool playing() const { return playing_; }
     int currentBeat() const { return currentBeat_; }
-    bool timerActive() const { return timerActive_; }
-    int timerRemaining() const { return timerRemaining_; }
 
     /// Nombres de tempo (italiano) que cubren el BPM dado.
     static QStringList tempoLabels(int bpm);
@@ -52,9 +50,6 @@ public slots:
     void playPause();
     void stop();
 
-    void setTimerActive(bool active);
-    void changeCountdown(int deltaSeconds);
-
 signals:
     void bpmChanged(int bpm);
     void timeInMeasureChanged(int count);
@@ -62,7 +57,6 @@ signals:
     void accentFirstBeatChanged(bool accent);
     void playingChanged(bool playing);
     void beatChanged(int index);
-    void timerChanged();
 
 private:
     void play();
@@ -70,9 +64,6 @@ private:
     void pause();
     void restartIfRunning();
     void applyBpmStep(int step);
-    void startTimer();
-    void stopTimer(bool reset);
-    void onTimerTick();
 
     std::unique_ptr<ClickGenerator> generator_;
     std::unique_ptr<QAudioSink> sink_;
@@ -93,11 +84,6 @@ private:
 
     QElapsedTimer tapClock_;
     qint64 lastTapMs_ = -1;
-
-    QTimer countdownTimer_;
-    bool timerActive_ = false;
-    int timerSeconds_ = 60;
-    int timerRemaining_ = 60;
 };
 
 #endif // METRONOMEENGINE_HPP

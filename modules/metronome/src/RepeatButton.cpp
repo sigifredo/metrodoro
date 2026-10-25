@@ -18,7 +18,7 @@ void RepeatButton::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.setPen(QPen(QColor(136, 146, 153, hovered_ ? 255 : 128), 1));
+    painter.setPen(QPen(QColor(136, 146, 153, hovered_ && isEnabled() ? 255 : 128), 1));
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(rect().adjusted(1, 1, -1, -1));
 

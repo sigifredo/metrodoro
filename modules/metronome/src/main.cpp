@@ -21,7 +21,7 @@ int main(int argc, char **argv)
         app.setStyleSheet(QString::fromUtf8(styleFile.readAll()));
 
     MainWindow window;
-    window.resize(480, 760);
+    window.resize(480, 920);
     window.show();
 
     return app.exec();
