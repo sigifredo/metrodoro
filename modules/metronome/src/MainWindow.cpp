@@ -107,7 +107,7 @@ namespace
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), engine_(new MetronomeEngine(this)), session_(new PracticeSession(engine_, this))
 {
-    setWindowTitle(QStringLiteral("Metronome"));
+    setWindowTitle(QStringLiteral("Metrodoro"));
     buildUi();
 
     connect(engine_, &MetronomeEngine::bpmChanged, this, &MainWindow::updateBpm);

@@ -24,23 +24,23 @@ src/PracticeSession.cpp
 set(APP_ICON_ICNS ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/metronome.icns)
 set(APP_ICON_ICO ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/metronome.ico)
 
-qt_add_executable(metronome WIN32 MACOSX_BUNDLE
+qt_add_executable(metrodoro WIN32 MACOSX_BUNDLE
     ${HDRS}
     ${SRCS}
     src/main.cpp
 )
 
 if(APPLE)
-    target_sources(metronome PRIVATE ${APP_ICON_ICNS})
+    target_sources(metrodoro PRIVATE ${APP_ICON_ICNS})
     set_source_files_properties(${APP_ICON_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    set_target_properties(metronome PROPERTIES MACOSX_BUNDLE_ICON_FILE metronome.icns)
+    set_target_properties(metrodoro PROPERTIES MACOSX_BUNDLE_ICON_FILE metronome.icns)
 elseif(WIN32)
     set(APP_RC ${CMAKE_CURRENT_BINARY_DIR}/metronome_icon.rc)
     file(WRITE ${APP_RC} "IDI_ICON1 ICON \"${APP_ICON_ICO}\"\n")
-    target_sources(metronome PRIVATE ${APP_RC})
+    target_sources(metrodoro PRIVATE ${APP_RC})
 endif()
 
-qt_add_resources(metronome "metronome_resources"
+qt_add_resources(metrodoro "metronome_resources"
     PREFIX "/metronome"
     BASE resources
     FILES
@@ -58,11 +58,11 @@ qt_add_resources(metronome "metronome_resources"
         resources/fonts/Inter-SemiBold.ttf
 )
 
-target_include_directories(metronome PRIVATE
+target_include_directories(metrodoro PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(metronome PRIVATE
+target_link_libraries(metrodoro PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets

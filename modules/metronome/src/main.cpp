@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    QApplication::setOrganizationName("Metronomo");
-    QApplication::setApplicationName("metronome");
+    QApplication::setOrganizationName("Metrodoro");
+    QApplication::setApplicationName("metrodoro");
     QApplication::setWindowIcon(QIcon(QStringLiteral(":/metronome/icons/metronome.svg")));
     QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
 
