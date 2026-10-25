@@ -280,6 +280,7 @@ void MainWindow::buildUi()
     roundsLabel_ = addStepper(body, practiceBody_, strings.rounds, [this](int d)
                               { session_->changeRounds(d); });
     totalLabel_ = new QLabel(practiceBody_);
+    totalLabel_->setObjectName(QStringLiteral("total"));
     totalLabel_->setAlignment(Qt::AlignCenter);
     body->addWidget(totalLabel_);
 

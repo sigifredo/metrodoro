@@ -51,6 +51,11 @@ qt_add_resources(metronome "metronome_resources"
         resources/icons/shuffle.png
         resources/icons/metronome.svg
         resources/style/style.qss
+        resources/fonts/Hack-Regular.ttf
+        resources/fonts/Hack-Bold.ttf
+        resources/fonts/Inter-Regular.ttf
+        resources/fonts/Inter-Medium.ttf
+        resources/fonts/Inter-SemiBold.ttf
 )
 
 target_include_directories(metronome PRIVATE

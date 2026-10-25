@@ -7,6 +7,18 @@ MainWindow {
     background-color: #202020;
 }
 
+/* Texto en Inter; cifras en Hack (monoespaciada). */
+QWidget {
+    font-family: "Inter";
+}
+
+QLabel#bpm,
+QLabel#countdown,
+QLabel#counter,
+QLabel#total {
+    font-family: "Hack";
+}
+
 QLabel, QCheckBox {
     color: #F9F9F9;
     background: transparent;
@@ -15,7 +27,7 @@ QLabel, QCheckBox {
 QLabel#bpm {
     color: #2196F3;
     font-size: 112px;
-    font-weight: 800;
+    font-weight: bold;
 }
 
 QLabel#tempo {
@@ -108,7 +120,7 @@ QLabel#phase[rest="true"] {
 QLabel#countdown {
     color: #2196F3;
     font-size: 44px;
-    font-weight: 800;
+    font-weight: bold;
 }
 
 QLabel:disabled, QCheckBox:disabled {
