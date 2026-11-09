@@ -45,6 +45,11 @@ Detalles que conviene no romper:
 - Comentarios y textos en español. Los textos de la interfaz están en español, inglés y francés mediante `txt()` (`Texts.hpp`); cualquier texto nuevo debe agregarse en los tres.
 - Los colores y tamaños van en `resources/style/style.qss`, no en el código, salvo en los widgets pintados a mano.
 
+## Commits
+
+- Los mensajes siguen [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/): `tipo(ámbito opcional): descripción`, con tipos como `feat`, `fix`, `docs`, `chore`, `refactor`, `build`, `style`, `perf` y `test`. Los cambios incompatibles llevan `!` tras el tipo o un pie `BREAKING CHANGE:`.
+- La descripción va en español y en una sola línea, sin saltos internos. Sin líneas de atribución (`Co-Authored-By` y similares).
+
 ## Estilo visual
 
 - Fondo `#202020`, texto `#F9F9F9`, gris de controles `#889299`, acento azul `#2196F3` (degradado `#64B5F6` a `#1976D2` en el icono SVG) y verde `#6FCF97` para el descanso.
