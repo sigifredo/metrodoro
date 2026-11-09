@@ -69,9 +69,9 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
     }
 
     page->addWidget(makeCard(txt("Teclado", "Keyboard", "Clavier"), this, &body));
-    body->addWidget(note(txt("Espacio: tocar o pausar\nT: marcar el tempo (TAP)\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Mayús+↑ / ↓: tempo ±5\nCtrl+S: guardar como preajuste\nCtrl+1, 2, 3, 4: cambiar de pestaña",
+    body->addWidget(note(nativeKeys(txt("Espacio: tocar o pausar\nT: marcar el tempo (TAP)\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Mayús+↑ / ↓: tempo ±5\nCtrl+S: guardar como preajuste\nCtrl+1, 2, 3, 4: cambiar de pestaña",
                              "Space: play or pause\nT: tap the tempo\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Shift+↑ / ↓: tempo ±5\nCtrl+S: save as preset\nCtrl+1, 2, 3, 4: switch tab",
-                             "Espace : lecture ou pause\nT : marquer le tempo (TAP)\nCtrl+↑ / Ctrl+↓ : tempo ±1\nCtrl+Maj+↑ / ↓ : tempo ±5\nCtrl+S : enregistrer comme préréglage\nCtrl+1, 2, 3, 4 : changer d'onglet"),
+                             "Espace : lecture ou pause\nT : marquer le tempo (TAP)\nCtrl+↑ / Ctrl+↓ : tempo ±1\nCtrl+Maj+↑ / ↓ : tempo ±5\nCtrl+S : enregistrer comme préréglage\nCtrl+1, 2, 3, 4 : changer d'onglet")),
                          this));
 
     page->addWidget(makeCard(txt("Acerca de", "About", "À propos"), this, &body));

@@ -99,7 +99,7 @@ LibraryTab::LibraryTab(MetronomeEngine *engine, PracticeSession *session, Librar
     presetsColumn->setContentsMargins(0, 0, 0, 0);
     presetsColumn->setSpacing(10);
     auto *save = makeButton(txt("Guardar el actual", "Save current", "Enregistrer l'actuel"), "primary", presetsPage);
-    save->setToolTip(QStringLiteral("Ctrl+S"));
+    save->setToolTip(nativeKeys(QStringLiteral("Ctrl+S")));
     auto *saveRow = new QHBoxLayout;
     auto *importButton = makeButton(txt("Importar…", "Import…", "Importer…"), "small", presetsPage);
     auto *exportButton = makeButton(txt("Exportar…", "Export…", "Exporter…"), "small", presetsPage);

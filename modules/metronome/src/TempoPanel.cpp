@@ -77,7 +77,7 @@ TempoPanel::TempoPanel(MetronomeEngine *engine, PracticeSession *session, AppSet
     bpmRow->setSpacing(8);
     slider_ = new QSlider(Qt::Horizontal, this);
     slider_->setRange(ClickConfig::kMinBpm, ClickConfig::kMaxBpm);
-    slider_->setToolTip(QStringLiteral("Tempo (Ctrl+↑ / Ctrl+↓)"));
+    slider_->setToolTip(nativeKeys(QStringLiteral("Tempo (Ctrl+↑ / Ctrl+↓)")));
     for (int step : {-5, -1})
     {
         auto *button = new RepeatButton(QStringLiteral("\u2212%1").arg(-step), this);

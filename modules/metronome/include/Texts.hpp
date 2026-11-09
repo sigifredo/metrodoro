@@ -22,6 +22,15 @@ inline QString txt(const char *es, const char *en, const char *fr)
     }
 }
 
+/// Adapta los atajos escritos con «Ctrl» a la tecla del sistema: en macOS Qt::CTRL es Cmd.
+inline QString nativeKeys(QString text)
+{
+#ifdef Q_OS_MACOS
+    text.replace(QStringLiteral("Ctrl"), QStringLiteral("Cmd"));
+#endif
+    return text;
+}
+
 inline QString subdivisionLabel(Subdivision s)
 {
     switch (s)
