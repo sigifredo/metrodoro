@@ -15,7 +15,7 @@ Metrónomo de escritorio con un **modo práctica tipo pomodoro**: alterna rondas
 - Compases mudos: suena N compases y calla M, también al azar. Los puntos siguen marcando los tiempos, atenuados.
 - Péndulo animado y destello de pantalla opcionales (vienen apagados), sincronizados con lo que se oye.
 - Preajustes con nombre y repertorios (listas de preajustes con compases por entrada y avance automático), que se pueden importar y exportar como archivo JSON.
-- Icono en la bandeja del sistema (clic para tocar o pausar), pausa si se pierde la salida de audio (por ejemplo, al desconectar unos auriculares) y, en Linux, evita que el equipo se suspenda mientras suena.
+- Icono en la bandeja del sistema (clic para tocar o pausar), pausa si se pierde la salida de audio (por ejemplo, al desconectar unos auriculares) y evita que el equipo se suspenda mientras suena (Linux, macOS y Windows).
 - Estadísticas de constancia: minutos con el metrónomo por día, últimos siete días y racha.
 - Recuerda el último estado del metrónomo y de la sesión de práctica.
 - Interfaz en español, inglés y francés según el idioma del sistema.

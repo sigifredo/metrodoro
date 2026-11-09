@@ -112,6 +112,10 @@ target_link_libraries(metrodoro PRIVATE
     Qt6::Svg
 )
 
+if(APPLE)
+    target_link_libraries(metrodoro PRIVATE "-framework IOKit" "-framework CoreFoundation")
+endif()
+
 if(UNIX AND NOT APPLE)
     target_link_libraries(metrodoro PRIVATE Qt6::DBus)
     target_compile_definitions(metrodoro PRIVATE METRODORO_HAS_DBUS)

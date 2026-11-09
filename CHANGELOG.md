@@ -9,7 +9,7 @@ Todos los cambios relevantes de Metrodoro se documentan en este archivo. El form
 - Compases de tamaño mixto con grupos de tiempos personalizados.
 - Polirritmos de dos capas.
 - Importar y exportar la biblioteca (preajustes y repertorios) como archivo JSON.
-- Equivalentes de escritorio de las funciones móviles: icono de bandeja del sistema, pausa al perder la salida de audio y bloqueo de suspensión en Linux.
+- Equivalentes de escritorio de las funciones móviles: icono de bandeja del sistema, pausa al perder la salida de audio y bloqueo de suspensión (Linux, macOS y Windows).
 - Plantilla `Info.plist` propia para el bundle de macOS, con versión, categoría, idiomas, versión mínima del sistema (12.0) y soporte de pantallas de alta resolución.
 
 ### Cambiado
