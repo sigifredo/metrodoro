@@ -55,6 +55,8 @@ public:
 
     const ClickConfig &config() const { return config_; }
     bool running() const { return running_; }
+    /// Pulso actual de la segunda capa (-1 si no suena).
+    int polyBeat() const { return polyBeat_; }
     const LiveState &live() const { return live_; }
     const std::optional<SetlistRun> &setlistRun() const { return setlistRun_; }
     float volume() const { return volume_; }
@@ -85,6 +87,7 @@ signals:
     void configChanged();
     void runningChanged(bool running);
     void pulse(const LiveState &live);
+    void polyPulse(int index);
     void setlistChanged();
 
 private:
@@ -104,6 +107,7 @@ private:
     std::deque<Pulse> due_;
     QTimer pollTimer_;
     qint64 pulseSeq_ = 0;
+    int polyBeat_ = -1;
 
     QTimer repeatTimer_;
     int repeatStep_ = 0;

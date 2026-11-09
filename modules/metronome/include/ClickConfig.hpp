@@ -76,6 +76,17 @@ struct GapConfig
     bool operator==(const GapConfig &) const = default;
 };
 
+/// Segunda capa: `beats` pulsos repartidos por igual en cada compás (3 contra 4, 5 contra 4...).
+struct PolyConfig
+{
+    bool enabled = false;
+    int beats = 3;
+    ClickSound sound = ClickSound::Wood;
+    float volume = 0.7f;
+
+    bool operator==(const PolyConfig &) const = default;
+};
+
 /// Todo lo que define cómo suena el metrónomo. Es un valor: el hilo de audio trabaja con copias.
 struct ClickConfig
 {
@@ -98,6 +109,7 @@ struct ClickConfig
     int countInBars = 0;
     TrainerConfig trainer;
     GapConfig gap;
+    PolyConfig poly;
 
     ClickConfig();
 

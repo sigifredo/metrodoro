@@ -66,6 +66,9 @@ void ClickGenerator::resetState()
     segStarted_ = false;
     inSequence_ = false;
     finished_ = false;
+    polyActive_ = false;
+    polyIdx_ = 0;
+    polyCountdown_ = 0.0;
     voiceTable_.fill(nullptr);
     voicePos_.fill(0);
     nextVoice_ = 0;
@@ -89,6 +92,20 @@ int16_t ClickGenerator::renderFrame()
     {
         startNote();
         samplesUntilNext_ += kSampleRate * 60.0 / barInfo_.bpm / subdivisionSlots(cfg_.subdivision);
+    }
+    if (polyActive_ && cfg_.poly.enabled)
+    {
+        if (polyCountdown_ <= 0.0 && polyIdx_ < cfg_.poly.beats)
+        {
+            play(cfg_.poly.sound, ClickSynth::Mid, cfg_.poly.volume);
+            {
+                QMutexLocker lock(&mutex_);
+                pending_.push_back({frame_, polyIdx_, bar_, barInfo_.bpm, false, false, segment_, false, true});
+            }
+            ++polyIdx_;
+            polyCountdown_ += polyPeriod_;
+        }
+        polyCountdown_ -= 1.0;
     }
     samplesUntilNext_ -= 1.0;
     ++frame_;
@@ -220,6 +237,12 @@ bool ClickGenerator::beginBar(const std::optional<QList<SequenceStep>> &sequence
         segStarted_ = false;
     bar_ = planner_.playedBars();
     needBar_ = false;
+
+    // La segunda capa arranca con el compás y calla en la cuenta previa y en los compases mudos.
+    polyActive_ = cfg_.poly.enabled && !barInfo_.countIn && !barInfo_.muted;
+    polyIdx_ = 0;
+    polyCountdown_ = 0.0;
+    polyPeriod_ = kSampleRate * 60.0 / barInfo_.bpm * cfg_.beats / std::max(cfg_.poly.beats, 1);
     return true;
 }
 

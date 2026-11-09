@@ -153,6 +153,10 @@ TempoPanel::TempoPanel(MetronomeEngine *engine, PracticeSession *session, AppSet
                                   return next; });
             });
     connect(engine_, &MetronomeEngine::pulse, this, &TempoPanel::onPulse);
+    connect(engine_, &MetronomeEngine::polyPulse, this, [this](int index)
+            {
+                const PolyConfig &poly = engine_->config().poly;
+                beats_->setPoly(poly.enabled ? poly.beats : 0, index); });
     connect(settings_, &AppSettings::changed, this, &TempoPanel::refresh);
 
     refresh();
@@ -183,6 +187,7 @@ void TempoPanel::refresh()
     pendulum_->setVisible(settings_->pendulum());
     const LiveState &live = engine_->live();
     beats_->setAccents(engine_->config().accents);
+    beats_->setPoly(engine_->config().poly.enabled ? engine_->config().poly.beats : 0, engine_->running() ? engine_->polyBeat() : -1);
     beats_->setCurrent(engine_->running() ? live.beat : -1, live.muted && engine_->running(), live.countIn && engine_->running());
 }
 

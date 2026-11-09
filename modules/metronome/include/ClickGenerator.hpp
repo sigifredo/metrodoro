@@ -38,6 +38,8 @@ struct Pulse
     bool countIn = false;
     int segment = 0;
     bool end = false;
+    /// Pulso de la segunda capa (polirritmo): `beat` es su índice dentro del compás.
+    bool poly = false;
 };
 
 /**
@@ -115,6 +117,12 @@ private:
     bool segStarted_ = false;
     bool inSequence_ = false;
     bool finished_ = false;
+
+    // Segunda capa (polirritmo): se reparte por igual en cada compás.
+    bool polyActive_ = false;
+    int polyIdx_ = 0;
+    double polyCountdown_ = 0.0;
+    double polyPeriod_ = 0.0;
 
     std::array<const ClickSynth::Table *, kVoices> voiceTable_{};
     std::array<int, kVoices> voicePos_{};

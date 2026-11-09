@@ -121,6 +121,7 @@ void MetronomeEngine::start()
     generator_->restart();
     due_.clear();
     live_ = {};
+    polyBeat_ = -1;
     sink_->start(generator_.get());
     running_ = true;
     pollTimer_.start();
@@ -137,6 +138,8 @@ void MetronomeEngine::stop()
     due_.clear();
     running_ = false;
     live_ = {};
+    polyBeat_ = -1;
+    emit polyPulse(-1);
     emit runningChanged(false);
     emit pulse(live_);
 }
@@ -175,6 +178,13 @@ void MetronomeEngine::handlePulse(const Pulse &p)
         generator_->clearSequence();
         emit setlistChanged();
         stop();
+        return;
+    }
+
+    if (p.poly)
+    {
+        polyBeat_ = p.beat;
+        emit polyPulse(p.beat);
         return;
     }
 

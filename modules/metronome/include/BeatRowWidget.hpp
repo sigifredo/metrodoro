@@ -18,6 +18,8 @@ public:
     void setAccents(const QList<Accent> &accents);
     /// `muted` atenúa el compás (compás mudo); `countIn` pinta el tiempo activo en verde.
     void setCurrent(int index, bool muted, bool countIn);
+    /// Segunda capa (polirritmo): una fila de puntos pequeños bajo los tiempos. `count` 0 la oculta.
+    void setPoly(int count, int current);
     QSize sizeHint() const override;
 
 signals:
@@ -30,6 +32,7 @@ protected:
 private:
     static constexpr int kCell = 46;
     static constexpr int kMaxPerRow = 8;
+    static constexpr int kPolyRow = 26;
 
     int perRow() const;
     QRect cellRect(int index) const;
@@ -38,6 +41,8 @@ private:
     int current_ = -1;
     bool muted_ = false;
     bool countIn_ = false;
+    int polyCount_ = 0;
+    int polyCurrent_ = -1;
 };
 
 #endif // BEATROWWIDGET_HPP

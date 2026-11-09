@@ -31,6 +31,16 @@ void BeatRowWidget::setCurrent(int index, bool muted, bool countIn)
     update();
 }
 
+void BeatRowWidget::setPoly(int count, int current)
+{
+    const bool resized = count != polyCount_;
+    polyCount_ = count;
+    polyCurrent_ = current;
+    if (resized)
+        updateGeometry();
+    update();
+}
+
 int BeatRowWidget::perRow() const
 {
     const int n = static_cast<int>(accents_.size());
@@ -40,7 +50,7 @@ int BeatRowWidget::perRow() const
 QSize BeatRowWidget::sizeHint() const
 {
     const int rows = (static_cast<int>(accents_.size()) + perRow() - 1) / perRow();
-    return {perRow() * kCell, std::max(rows, 1) * kCell};
+    return {perRow() * kCell, std::max(rows, 1) * kCell + (polyCount_ > 0 ? kPolyRow : 0)};
 }
 
 QRect BeatRowWidget::cellRect(int index) const
@@ -143,5 +153,29 @@ void BeatRowWidget::paintEvent(QPaintEvent *)
             painter.setBrush(Qt::NoBrush);
         }
         painter.drawEllipse(dot.adjusted(1, 1, -1, -1));
+    }
+
+    if (polyCount_ > 0)
+    {
+        painter.setOpacity(1.0);
+        const int rows = (static_cast<int>(accents_.size()) + perRow() - 1) / perRow();
+        const qreal y = std::max(rows, 1) * kCell + kPolyRow / 2.0 - 2;
+        const qreal step = std::min<qreal>(28.0, (width() - 16.0) / polyCount_);
+        qreal x = (width() - step * polyCount_) / 2 + step / 2;
+        for (int i = 0; i < polyCount_; ++i, x += step)
+        {
+            const bool on = i == polyCurrent_;
+            if (on)
+            {
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(QColor(0xF9, 0xF9, 0xF9));
+            }
+            else
+            {
+                painter.setPen(QPen(QColor(0xF9, 0xF9, 0xF9, 150), 1.5));
+                painter.setBrush(Qt::NoBrush);
+            }
+            painter.drawRect(QRectF(x - 5, y - 5, 10, 10));
+        }
     }
 }

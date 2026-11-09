@@ -35,6 +35,10 @@ private:
     ChipRow *sounds_ = nullptr;
     QSlider *subVolume_ = nullptr;
     ChipRow *countIn_ = nullptr;
+    QCheckBox *polyOn_ = nullptr;
+    StepperRow *polyBeats_ = nullptr;
+    ChipRow *polySound_ = nullptr;
+    QSlider *polyVolume_ = nullptr;
     QCheckBox *flash_ = nullptr;
 };
 

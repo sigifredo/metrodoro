@@ -14,6 +14,9 @@
 #include <QSlider>
 #include <QVBoxLayout>
 
+// std
+#include <algorithm>
+
 namespace
 {
     // Compases habituales con sus acentos agrupados (6/8 es 3+3, 7/8 es 2+2+3...).
@@ -65,11 +68,29 @@ MetronomeTab::MetronomeTab(MetronomeEngine *engine, AppSettings *settings, QWidg
     subdivisions_ = new SubdivisionSelector(this);
     body->addWidget(subdivisions_);
 
-    // Sonido y ayudas
-    page->addWidget(makeCard(txt("Sonido y ayudas", "Sound and aids", "Son et aides"), this, &body));
     QStringList soundLabels;
     for (int i = 0; i < kClickSoundCount; ++i)
         soundLabels << soundLabel(static_cast<ClickSound>(i));
+
+    // Polirritmo
+    page->addWidget(makeCard(txt("Polirritmo", "Polyrhythm", "Polyrythmie"), this, &body));
+    polyOn_ = new QCheckBox(txt("Segunda capa de pulsos", "Second layer of pulses", "Deuxième couche de pulsations"), this);
+    body->addWidget(makeSwitchRow(polyOn_,
+                                  txt("Reparte N pulsos por igual en cada compás, contra los tiempos del compás (3 contra 4, 5 contra 4...)",
+                                      "Spreads N pulses evenly across each bar, against the beats of the bar (3 against 4, 5 against 4...)",
+                                      "Répartit N pulsations à égalité dans chaque mesure, contre les temps de la mesure (3 contre 4, 5 contre 4...)"),
+                                  this));
+    polyBeats_ = new StepperRow(txt("Pulsos", "Pulses", "Pulsations"), this);
+    body->addWidget(polyBeats_);
+    polySound_ = new ChipRow(soundLabels, this);
+    body->addWidget(polySound_);
+    body->addWidget(new QLabel(txt("Volumen de la segunda capa", "Second layer volume", "Volume de la deuxième couche"), this));
+    polyVolume_ = new QSlider(Qt::Horizontal, this);
+    polyVolume_->setRange(0, 100);
+    body->addWidget(polyVolume_);
+
+    // Sonido y ayudas
+    page->addWidget(makeCard(txt("Sonido y ayudas", "Sound and aids", "Son et aides"), this, &body));
     sounds_ = new ChipRow(soundLabels, this);
     body->addWidget(sounds_);
     body->addWidget(new QLabel(txt("Volumen de la subdivisión", "Subdivision volume", "Volume de la subdivision"), this));
@@ -126,6 +147,24 @@ MetronomeTab::MetronomeTab(MetronomeEngine *engine, AppSettings *settings, QWidg
                                 ClickConfig next = c;
                                 next.subdivision = s;
                                 return next; }); });
+    const auto editPoly = [this](auto change)
+    { engine_->edit([change](const ClickConfig &c)
+                    {
+                        ClickConfig next = c;
+                        change(next.poly);
+                        return next; }); };
+    connect(polyOn_, &QCheckBox::toggled, this, [editPoly](bool on)
+            { editPoly([on](PolyConfig &p)
+                       { p.enabled = on; }); });
+    connect(polyBeats_, &StepperRow::stepped, this, [editPoly](int d)
+            { editPoly([d](PolyConfig &p)
+                       { p.beats = std::clamp(p.beats + d, 2, ClickConfig::kMaxBeats); }); });
+    connect(polySound_, &ChipRow::activated, this, [editPoly](int i)
+            { editPoly([i](PolyConfig &p)
+                       { p.sound = static_cast<ClickSound>(i); }); });
+    connect(polyVolume_, &QSlider::valueChanged, this, [editPoly](int v)
+            { editPoly([v](PolyConfig &p)
+                       { p.volume = v / 100.0f; }); });
     connect(sounds_, &ChipRow::activated, this, [this](int i)
             { engine_->edit([i](const ClickConfig &c)
                             {
@@ -172,6 +211,16 @@ void MetronomeTab::refresh()
         subVolume_->setValue(qRound(c.subVolume * 100));
     }
     subVolume_->setEnabled(c.subdivision != Subdivision::Quarter);
+    {
+        const QSignalBlocker blocker(polyOn_);
+        polyOn_->setChecked(c.poly.enabled);
+    }
+    polyBeats_->setText(QStringLiteral("%1 : %2").arg(c.poly.beats).arg(c.beats));
+    polySound_->setCurrent(static_cast<int>(c.poly.sound));
+    {
+        const QSignalBlocker blocker(polyVolume_);
+        polyVolume_->setValue(qRound(c.poly.volume * 100));
+    }
     {
         const QSignalBlocker blocker(flash_);
         flash_->setChecked(settings_->flash());

@@ -164,7 +164,11 @@ QJsonObject ClickConfig::toJson() const
         {"gEnabled", gap.enabled},
         {"gPlay", gap.playBars},
         {"gMute", gap.muteBars},
-        {"gRandom", gap.random}};
+        {"gRandom", gap.random},
+        {"polyEnabled", poly.enabled},
+        {"polyBeats", poly.beats},
+        {"polySound", QLatin1String(kSoundNames[static_cast<int>(poly.sound)])},
+        {"polyVol", static_cast<double>(poly.volume)}};
 }
 
 ClickConfig ClickConfig::fromJson(const QJsonObject &o)
@@ -218,6 +222,11 @@ ClickConfig ClickConfig::fromJson(const QJsonObject &o)
     c.gap.playBars = std::clamp(o.value("gPlay").toInt(d.gap.playBars), 1, 16);
     c.gap.muteBars = std::clamp(o.value("gMute").toInt(d.gap.muteBars), 1, 16);
     c.gap.random = o.value("gRandom").toBool(false);
+
+    c.poly.enabled = o.value("polyEnabled").toBool(false);
+    c.poly.beats = std::clamp(o.value("polyBeats").toInt(d.poly.beats), 2, kMaxBeats);
+    c.poly.sound = enumFromName(o.value("polySound").toString(), kSoundNames, d.poly.sound);
+    c.poly.volume = std::clamp(static_cast<float>(o.value("polyVol").toDouble(d.poly.volume)), 0.0f, 1.0f);
     return c;
 }
 
