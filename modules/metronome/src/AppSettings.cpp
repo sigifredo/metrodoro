@@ -14,6 +14,8 @@ AppSettings::AppSettings(QObject *parent)
     pendulum_ = settings_.value("pendulum", false).toBool();
     phaseSound_ = settings_.value("phaseSound", true).toBool();
     volume_ = std::clamp(settings_.value("volume", 1.0).toFloat(), 0.0f, 1.0f);
+    keepAwake_ = settings_.value("keepAwake", true).toBool();
+    pauseOnUnplug_ = settings_.value("pauseOnUnplug", true).toBool();
 }
 
 void AppSettings::store()
@@ -22,6 +24,8 @@ void AppSettings::store()
     settings_.setValue("pendulum", pendulum_);
     settings_.setValue("phaseSound", phaseSound_);
     settings_.setValue("volume", volume_);
+    settings_.setValue("keepAwake", keepAwake_);
+    settings_.setValue("pauseOnUnplug", pauseOnUnplug_);
     emit changed();
 }
 
@@ -49,12 +53,26 @@ void AppSettings::setVolume(float volume)
     store();
 }
 
+void AppSettings::setKeepAwake(bool on)
+{
+    keepAwake_ = on;
+    store();
+}
+
+void AppSettings::setPauseOnUnplug(bool on)
+{
+    pauseOnUnplug_ = on;
+    store();
+}
+
 void AppSettings::reset()
 {
     flash_ = true;
     pendulum_ = false;
     phaseSound_ = true;
     volume_ = 1.0f;
+    keepAwake_ = true;
+    pauseOnUnplug_ = true;
     store();
 }
 

@@ -9,11 +9,17 @@
 #include <PracticeSession.hpp>
 #include <PracticeTab.hpp>
 #include <SettingsTab.hpp>
+#include <SleepInhibitor.hpp>
 #include <StatsStore.hpp>
 #include <TempoPanel.hpp>
 #include <Texts.hpp>
 
 // qt
+#include <QAction>
+#include <QApplication>
+#include <QMediaDevices>
+#include <QMenu>
+#include <QSystemTrayIcon>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QShortcut>
@@ -21,7 +27,8 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), settings_(new AppSettings(this)), engine_(new MetronomeEngine(this)),
-      session_(new PracticeSession(engine_, this)), stats_(new StatsStore(this)), library_(new LibraryStore(this)), chime_(new PhaseChime(this))
+      session_(new PracticeSession(engine_, this)), stats_(new StatsStore(this)), library_(new LibraryStore(this)), chime_(new PhaseChime(this)),
+      inhibitor_(new SleepInhibitor(this)), devices_(new QMediaDevices(this))
 {
     setWindowTitle(QStringLiteral("Metrodoro"));
     setMinimumSize(900, 660);
@@ -38,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     buildUi();
     buildShortcuts();
+    buildTray();
 
     connect(engine_, &MetronomeEngine::configChanged, this, &MainWindow::onConfigChanged);
     connect(engine_, &MetronomeEngine::runningChanged, this, &MainWindow::updatePlayButton);
@@ -57,7 +65,13 @@ MainWindow::MainWindow(QWidget *parent)
                 engine_->setVolume(settings_->volume());
                 metronomeTab_->refresh();
                 settingsTab_->refresh();
+                updatePlayButton();
             });
+    connect(devices_, &QMediaDevices::audioOutputsChanged, this, [this]()
+            {
+                // Equivalente a desconectar los auriculares: si la salida desaparece, se pausa en vez de pasar a otra.
+                if (settings_->pauseOnUnplug() && engine_->running() && !engine_->outputAvailable())
+                    pausePlayback(); });
 
     onConfigChanged();
     onSessionChanged();
@@ -140,6 +154,7 @@ void MainWindow::buildShortcuts()
 
 void MainWindow::onConfigChanged()
 {
+    updateTray();
     tempo_->refresh();
     metronomeTab_->refresh();
     practiceTab_->refreshConfig();
@@ -169,8 +184,52 @@ void MainWindow::updatePlayButton()
 {
     // El botón sigue al motor con el modo práctica apagado y a la sesión con él encendido: durante un
     // descanso el motor calla pero la sesión corre, y el botón debe seguir encendido.
-    tempo_->setPlaying(engine_->running() || session_->running());
+    const bool playing = engine_->running() || session_->running();
+    tempo_->setPlaying(playing);
     tempo_->refresh();
+    inhibitor_->setActive(playing && settings_->keepAwake());
+    updateTray();
+}
+
+void MainWindow::pausePlayback()
+{
+    if (session_->running())
+        session_->toggle();
+    else
+        engine_->stop();
+}
+
+void MainWindow::buildTray()
+{
+    if (!QSystemTrayIcon::isSystemTrayAvailable())
+        return;
+    tray_ = new QSystemTrayIcon(QApplication::windowIcon(), this);
+    auto *menu = new QMenu(this);
+    menu->addAction(txt("Tocar / pausar", "Play / pause", "Lecture / pause"), this, &MainWindow::togglePlayback);
+    menu->addAction(txt("Mostrar Metrodoro", "Show Metrodoro", "Afficher Metrodoro"), this, [this]()
+                    {
+                        showNormal();
+                        raise();
+                        activateWindow(); });
+    menu->addSeparator();
+    menu->addAction(txt("Salir", "Quit", "Quitter"), qApp, &QApplication::quit);
+    tray_->setContextMenu(menu);
+    connect(tray_, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason)
+            {
+                if (reason == QSystemTrayIcon::Trigger)
+                    togglePlayback(); });
+    tray_->show();
+    updateTray();
+}
+
+void MainWindow::updateTray()
+{
+    if (!tray_)
+        return;
+    const bool playing = engine_->running() || session_->running();
+    tray_->setToolTip(QStringLiteral("Metrodoro — %1 BPM%2")
+                          .arg(engine_->shownBpm())
+                          .arg(playing ? QString() : txt(" (en pausa)", " (paused)", " (en pause)")));
 }
 
 void MainWindow::togglePlayback()

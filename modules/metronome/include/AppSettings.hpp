@@ -29,11 +29,15 @@ public:
     bool pendulum() const { return pendulum_; }
     bool phaseSound() const { return phaseSound_; }
     float volume() const { return volume_; }
+    bool keepAwake() const { return keepAwake_; }
+    bool pauseOnUnplug() const { return pauseOnUnplug_; }
 
     void setFlash(bool on);
     void setPendulum(bool on);
     void setPhaseSound(bool on);
     void setVolume(float volume);
+    void setKeepAwake(bool on);
+    void setPauseOnUnplug(bool on);
     void reset();
 
     // Último estado del metrónomo y de la sesión de práctica: la app arranca donde se dejó.
@@ -53,6 +57,8 @@ private:
     bool pendulum_ = false;
     bool phaseSound_ = true;
     float volume_ = 1.0f;
+    bool keepAwake_ = true;
+    bool pauseOnUnplug_ = true;
 };
 
 #endif // APPSETTINGS_HPP

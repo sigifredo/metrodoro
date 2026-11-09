@@ -7,6 +7,7 @@
 #include <TapTempo.hpp>
 
 // qt
+#include <QAudioDevice>
 #include <QElapsedTimer>
 #include <QObject>
 #include <QTimer>
@@ -60,6 +61,8 @@ public:
     const LiveState &live() const { return live_; }
     const std::optional<SetlistRun> &setlistRun() const { return setlistRun_; }
     float volume() const { return volume_; }
+    /// La salida de audio con la que está sonando (o sonó) el motor sigue conectada.
+    bool outputAvailable() const;
 
     /// Tempo que se muestra: el del pulso durante el entrenador, el configurado si está parado.
     /// Aplica una transformación a la configuración actual.
@@ -91,12 +94,14 @@ signals:
     void setlistChanged();
 
 private:
+    void createSink();
     void applyConfig(const ClickConfig &config);
     void pollPulses();
     void handlePulse(const Pulse &pulse);
 
     std::unique_ptr<ClickGenerator> generator_;
     std::unique_ptr<QAudioSink> sink_;
+    QAudioDevice device_;
 
     ClickConfig config_;
     bool running_ = false;

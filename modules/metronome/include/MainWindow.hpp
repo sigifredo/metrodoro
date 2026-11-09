@@ -14,8 +14,11 @@ class MetronomeTab;
 class PhaseChime;
 class PracticeSession;
 class PracticeTab;
+class QMediaDevices;
+class QSystemTrayIcon;
 class QTabWidget;
 class SettingsTab;
+class SleepInhibitor;
 class StatsStore;
 class QTimer;
 class TempoPanel;
@@ -41,6 +44,10 @@ private:
     void togglePlayback();
     void stopAll();
     void persistPractice();
+    void buildTray();
+    void updateTray();
+    /// Pausa (sin reiniciar) lo que esté sonando: la sesión si corre, o el motor.
+    void pausePlayback();
 
     AppSettings *settings_ = nullptr;
     MetronomeEngine *engine_ = nullptr;
@@ -48,6 +55,9 @@ private:
     StatsStore *stats_ = nullptr;
     LibraryStore *library_ = nullptr;
     PhaseChime *chime_ = nullptr;
+    SleepInhibitor *inhibitor_ = nullptr;
+    QMediaDevices *devices_ = nullptr;
+    QSystemTrayIcon *tray_ = nullptr;
 
     TempoPanel *tempo_ = nullptr;
     QTabWidget *tabs_ = nullptr;

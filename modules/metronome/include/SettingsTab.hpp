@@ -27,6 +27,8 @@ private:
     QCheckBox *flash_ = nullptr;
     QSlider *volume_ = nullptr;
     QCheckBox *phaseSound_ = nullptr;
+    QCheckBox *pauseOnUnplug_ = nullptr;
+    QCheckBox *keepAwake_ = nullptr;
 };
 
 #endif // SETTINGSTAB_HPP

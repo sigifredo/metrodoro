@@ -20,15 +20,7 @@ namespace
 MetronomeEngine::MetronomeEngine(QObject *parent)
     : QObject(parent), generator_(std::make_unique<ClickGenerator>())
 {
-    QAudioFormat format;
-    format.setSampleRate(ClickGenerator::kSampleRate);
-    format.setChannelCount(1);
-    format.setSampleFormat(QAudioFormat::Int16);
-
-    sink_ = std::make_unique<QAudioSink>(QMediaDevices::defaultAudioOutput(), format);
-    // Búfer corto para que los indicadores no se retrasen respecto al sonido.
-    sink_->setBufferSize(ClickGenerator::kSampleRate / 20 * 2);
-
+    createSink();
     generator_->open(QIODevice::ReadOnly);
     generator_->setConfig(config_);
     clock_.start();
@@ -47,6 +39,25 @@ MetronomeEngine::MetronomeEngine(QObject *parent)
                 else if (repeatCount_ == 20)
                     repeatTimer_.setInterval(kRepeatFastMs);
             });
+}
+
+void MetronomeEngine::createSink()
+{
+    QAudioFormat format;
+    format.setSampleRate(ClickGenerator::kSampleRate);
+    format.setChannelCount(1);
+    format.setSampleFormat(QAudioFormat::Int16);
+
+    device_ = QMediaDevices::defaultAudioOutput();
+    sink_ = std::make_unique<QAudioSink>(device_, format);
+    // Búfer corto para que los indicadores no se retrasen respecto al sonido.
+    sink_->setBufferSize(ClickGenerator::kSampleRate / 20 * 2);
+    sink_->setVolume(volume_);
+}
+
+bool MetronomeEngine::outputAvailable() const
+{
+    return QMediaDevices::audioOutputs().contains(device_);
 }
 
 MetronomeEngine::~MetronomeEngine()
@@ -117,6 +128,9 @@ void MetronomeEngine::start()
 {
     if (running_)
         return;
+    // Cada arranque usa la salida predeterminada de ese momento (por ejemplo, tras enchufar unos auriculares).
+    if (QMediaDevices::defaultAudioOutput() != device_)
+        createSink();
     generator_->setConfig(config_);
     generator_->restart();
     due_.clear();

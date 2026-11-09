@@ -17,6 +17,7 @@ include/PlayButton.hpp
 include/PracticeSession.hpp
 include/PracticeTab.hpp
 include/RepeatButton.hpp
+include/SleepInhibitor.hpp
 include/SettingsTab.hpp
 include/StatsStore.hpp
 include/SubdivisionSelector.hpp
@@ -44,6 +45,7 @@ src/PlayButton.cpp
 src/PracticeSession.cpp
 src/PracticeTab.cpp
 src/RepeatButton.cpp
+src/SleepInhibitor.cpp
 src/SettingsTab.cpp
 src/StatsStore.cpp
 src/SubdivisionSelector.cpp
@@ -102,3 +104,8 @@ target_link_libraries(metrodoro PRIVATE
     Qt6::Multimedia
     Qt6::Svg
 )
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(metrodoro PRIVATE Qt6::DBus)
+    target_compile_definitions(metrodoro PRIVATE METRODORO_HAS_DBUS)
+endif()

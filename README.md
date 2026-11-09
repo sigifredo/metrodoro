@@ -5,7 +5,8 @@ Metrónomo de escritorio con un **modo práctica tipo pomodoro**: alterna rondas
 ## Funciones
 
 - Metrónomo de 20 a 300 BPM con deslizador, botones −1/+1 y −5/+5 con repetición al mantener, cifra editable con un clic, botón TAP (promedia los últimos toques) y nombre del tempo en italiano.
-- Compás de 1 a 16 tiempos con unidad 2, 4, 8 o 16 y atajos de compases habituales (2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8, 12/8) con los acentos agrupados.
+- Compás de 1 a 16 tiempos con unidad 2, 4, 8 o 16 y atajos de compases habituales (2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8, 12/8) con los acentos agrupados. También compases mixtos con grupos propios (5+7, 2+2+3...).
+- Polirritmo de dos capas: N pulsos repartidos por igual en cada compás contra los tiempos (3 contra 4, 5 contra 4...), con sonido y volumen propios.
 - Acento por tiempo en cuatro niveles (fuerte, medio, débil, silencio): se cambia pulsando cada punto del compás.
 - Subdivisiones: negras, corcheas, tresillos, semicorcheas, quintillos, seisillos, shuffle y dos galopes, con volumen propio.
 - Seis sonidos sintetizados muestra a muestra, sin archivos de audio: Clásico, Madera, Clic, Bip, Hi-hat y Cencerro.
@@ -13,7 +14,8 @@ Metrónomo de escritorio con un **modo práctica tipo pomodoro**: alterna rondas
 - Entrenador de velocidad: sube (o baja) X BPM cada N compases hasta una meta.
 - Compases mudos: suena N compases y calla M, también al azar. Los puntos siguen marcando los tiempos, atenuados.
 - Péndulo animado y destello de pantalla opcionales, sincronizados con lo que se oye.
-- Preajustes con nombre y repertorios (listas de preajustes con compases por entrada y avance automático).
+- Preajustes con nombre y repertorios (listas de preajustes con compases por entrada y avance automático), que se pueden importar y exportar como archivo JSON.
+- Icono en la bandeja del sistema (clic para tocar o pausar), pausa si se pierde la salida de audio (por ejemplo, al desconectar unos auriculares) y, en Linux, evita que el equipo se suspenda mientras suena.
 - Estadísticas de constancia: minutos con el metrónomo por día, últimos siete días y racha.
 - Recuerda el último estado del metrónomo y de la sesión de práctica.
 - Interfaz en español, inglés y francés según el idioma del sistema.
@@ -67,7 +69,3 @@ En Linux y Windows el ejecutable queda en `build/bin/metrodoro`. Si Qt no está 
 ## Fuentes y licencias
 
 La interfaz usa [Inter](https://github.com/rsms/inter) para el texto y [Hack](https://github.com/source-foundry/Hack) para las cifras. Se incluyen en `modules/metronome/resources/fonts` con sus licencias (`Inter-LICENSE.txt` y `Hack-LICENSE.md`).
-
-## Ideas pendientes
-
-- Polirritmos, compases de tamaño mixto (5/8 + 7/8) e importar y exportar preajustes.

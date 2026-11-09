@@ -48,6 +48,15 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
                                   txt("Un tono propio al pasar de práctica a descanso y al terminar", "Its own tone when going from practice to break and at the end", "Un signal propre au passage de la pratique à la pause et à la fin"),
                                   this));
 
+    pauseOnUnplug_ = new QCheckBox(txt("Pausar al perder la salida de audio", "Pause when the audio output is lost", "Mettre en pause si la sortie audio disparaît"), this);
+    body->addWidget(makeSwitchRow(pauseOnUnplug_,
+                                  txt("Evita que suene por los altavoces sin querer al desconectar los auriculares", "Keeps it from playing through the speakers by accident when headphones are unplugged", "Évite que le son passe par les haut-parleurs par erreur quand le casque est débranché"),
+                                  this));
+    keepAwake_ = new QCheckBox(txt("Evitar la suspensión mientras suena", "Prevent sleep while playing", "Empêcher la mise en veille pendant la lecture"), this);
+    body->addWidget(makeSwitchRow(keepAwake_,
+                                  txt("Solo en Linux; en otros sistemas no tiene efecto", "Linux only; it has no effect on other systems", "Linux uniquement ; sans effet sur les autres systèmes"),
+                                  this));
+
     page->addWidget(makeCard(txt("Datos", "Data", "Données"), this, &body));
     auto *clearStats = new QPushButton(txt("Borrar estadísticas", "Clear statistics", "Effacer les statistiques"), this);
     auto *reset = new QPushButton(txt("Restablecer ajustes", "Reset settings", "Réinitialiser les réglages"), this);
@@ -82,6 +91,8 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
     connect(volume_, &QSlider::valueChanged, this, [this](int v)
             { settings_->setVolume(v / 100.0f); });
     connect(phaseSound_, &QCheckBox::toggled, settings_, &AppSettings::setPhaseSound);
+    connect(pauseOnUnplug_, &QCheckBox::toggled, settings_, &AppSettings::setPauseOnUnplug);
+    connect(keepAwake_, &QCheckBox::toggled, settings_, &AppSettings::setKeepAwake);
     connect(clearStats, &QPushButton::clicked, this, [this]()
             {
                 if (confirmDialog(this, txt("¿Borrar el tiempo practicado?", "Clear the practiced time?", "Effacer le temps pratiqué ?")))
@@ -104,6 +115,8 @@ void SettingsTab::refresh()
     sync(pendulum_, settings_->pendulum());
     sync(flash_, settings_->flash());
     sync(phaseSound_, settings_->phaseSound());
+    sync(pauseOnUnplug_, settings_->pauseOnUnplug());
+    sync(keepAwake_, settings_->keepAwake());
     const QSignalBlocker blocker(volume_);
     volume_->setValue(qRound(settings_->volume() * 100));
 }

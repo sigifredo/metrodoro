@@ -15,13 +15,14 @@ Si hace falta reconfigurar (por ejemplo tras añadir un archivo o un recurso): `
 
 Todo vive en `modules/metronome` (la carpeta y el prefijo de recursos `/metronome` conservan el nombre anterior; el ejecutable y el proyecto se llaman `metrodoro`). La capa de lógica no depende de widgets y la interfaz solo la observa. La lógica y el formato JSON vienen de la versión Android (`tmp/metrodoro`, Kotlin): los nombres y el comportamiento se mantienen para que ambas versiones sigan alineadas.
 
-- `ClickConfig`: valor con todo lo que define cómo suena (BPM, compás, acentos, subdivisión, sonido, cuenta previa, entrenador, mudos) y su JSON. Incluye `defaultAccents`, `beatGroups` y `tempoNames`. El hilo de audio trabaja con copias.
+- `ClickConfig`: valor con todo lo que define cómo suena (BPM, compás, grupos de tiempos, acentos, subdivisión, sonido, cuenta previa, entrenador, mudos, polirritmo) y su JSON. Incluye `defaultAccents`, `beatGroups` y `tempoNames`. El hilo de audio trabaja con copias.
 - `BarPlanner` y `TapTempo`: lógica pura. `BarPlanner` decide por compás la cuenta previa, el entrenador y los mudos.
 - `ClickSynth`: tablas de los seis timbres (tres alturas cada uno) y el aviso de cambio de fase.
-- `ClickGenerator`: `QIODevice` que renderiza PCM Int16 mono a 44100 Hz con un contador de fracción en `double` y hasta 16 voces solapadas. Toma un candado una vez por nota para leer la configuración en vivo o el repertorio. Anota cada pulso con su muestra.
+- `ClickGenerator`: `QIODevice` que renderiza PCM Int16 mono a 44100 Hz con un contador de fracción en `double` y hasta 16 voces solapadas. Toma un candado una vez por nota para leer la configuración en vivo o el repertorio. Anota cada pulso con su muestra. La segunda capa (polirritmo) se programa con su propio contador dentro del mismo bucle y emite pulsos con `poly = true`.
 - `MetronomeEngine`: configuración, TAP, repetición de ±BPM, repertorio en curso (`SetlistRun`) y reproducción (`start()`, `stop()`, `toggle()`). Entrega cada pulso cuando `processedUSecs` del sink alcanza su muestra, así que puntos, péndulo y destello coinciden con el sonido. `edit()` aplica una transformación a la configuración.
 - `PracticeSession`: sesión pomodoro. Controla el motor solo con `start()` y `stop()`, y mide el tiempo contra un `QElapsedTimer` (no cuenta ticks). Emite `changed`, `runningChanged` y `transitioned(Transition)`.
-- `AppSettings` (preferencias y último estado), `StatsStore` (segundos por día, 90 días) y `LibraryStore` (preajustes y repertorios en JSON): todos con `QSettings`.
+- `SleepInhibitor`: bloqueo de suspensión por logind (D-Bus); solo se compila en Linux (`METRODORO_HAS_DBUS`) y en el resto no hace nada.
+- `AppSettings` (preferencias y último estado), `StatsStore` (segundos por día, 90 días) y `LibraryStore` (preajustes y repertorios en JSON, con `exportJson`/`importJson`): todos con `QSettings`.
 - `MainWindow`: dos columnas. `TempoPanel` a la izquierda (cifra, deslizador, `BeatRowWidget`, `PendulumWidget`, TAP, play y aviso de práctica) y un `QTabWidget` a la derecha con `MetronomeTab`, `PracticeTab`, `LibraryTab` y `SettingsTab`, cada una dentro de un `QScrollArea` (`makeScrollPage`). Aquí viven los atajos y la lógica de qué sigue el botón de play.
 - Widgets pintados a mano: `PlayButton`, `RepeatButton`, `BeatRowWidget`, `PendulumWidget`, `SubdivisionSelector` (fichas con el glifo teñido o puntos de huecos) y `WeekChart`. Los pequeños reutilizables (`ChipRow`, `StepperRow`, tarjetas, `confirmDialog`) están en `Controls`.
 
@@ -33,7 +34,8 @@ Detalles que conviene no romper:
 - Los cambios de número de tiempos, unidad o subdivisión reinician el compás en curso; los de tempo, acentos, sonido y volumen de subdivisión se aplican en la siguiente nota. `BarPlanner::rebase` reinicia el entrenador si cambia el tempo base, y el BPM que se muestra durante el entrenador es el del pulso (`LiveState::bpm`), no `config.bpm`.
 - Los compases mudos siguen mostrando los tiempos, atenuados, para no perder el sitio.
 - Todo texto nuevo va en español, inglés y francés con `txt(es, en, fr)` (`Texts.hpp`), que elige según `QLocale()`.
-- Lo que solo tiene sentido en móvil no se portó: servicio en primer plano, notificación, botones de auriculares, vibración, pantalla encendida, pausa al desconectar auriculares y tema claro/oscuro del sistema.
+- El motor crea el `QAudioSink` de nuevo en `start()` si cambió la salida predeterminada, y `MainWindow` pausa (no reinicia) si la salida en uso desaparece (`outputAvailable()`), como el pausar al desconectar auriculares de Android.
+- Lo que solo tiene sentido en móvil no se portó: servicio en primer plano, notificación, botones de auriculares, vibración y tema claro/oscuro del sistema. El equivalente de escritorio es el icono de bandeja, la pausa al perder la salida de audio y el bloqueo de suspensión.
 
 ## Estilo de código
 
