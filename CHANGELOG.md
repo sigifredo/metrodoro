@@ -2,6 +2,17 @@
 
 Todos los cambios relevantes de Metrodoro se documentan en este archivo. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [0.2.1] - 2026-11-09
+
+### Corregido
+
+- El bloqueo de suspensión mientras suena el metrónomo o corre la sesión de práctica solo funcionaba en Linux; ahora también funciona en macOS (IOKit) y Windows (`SetThreadExecutionState`).
+- Los atajos de teclado se muestran con «Cmd» en lugar de «Ctrl» en macOS (Ajustes, Biblioteca y deslizador de tempo).
+
+### Cambiado
+
+- La versión pasa de 0.2.0 a 0.2.1.
+
 ## [0.2.0] - 2026-11-09
 
 ### Añadido
@@ -9,13 +20,12 @@ Todos los cambios relevantes de Metrodoro se documentan en este archivo. El form
 - Compases de tamaño mixto con grupos de tiempos personalizados.
 - Polirritmos de dos capas.
 - Importar y exportar la biblioteca (preajustes y repertorios) como archivo JSON.
-- Equivalentes de escritorio de las funciones móviles: icono de bandeja del sistema, pausa al perder la salida de audio y bloqueo de suspensión (Linux, macOS y Windows).
+- Equivalentes de escritorio de las funciones móviles: icono de bandeja del sistema, pausa al perder la salida de audio y bloqueo de suspensión en Linux.
 - Plantilla `Info.plist` propia para el bundle de macOS, con versión, categoría, idiomas, versión mínima del sistema (12.0) y soporte de pantallas de alta resolución.
 
 ### Cambiado
 
 - El identificador del bundle de macOS pasa a `dev.sigifredo.metrodoro` y el nombre visible a «Metrodoro».
-- La versión pasa de 0.1.0 a 0.2.0.
 
 ## [0.1.0]
 
