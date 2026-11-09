@@ -66,7 +66,14 @@ qt_add_executable(metrodoro WIN32 MACOSX_BUNDLE
 if(APPLE)
     target_sources(metrodoro PRIVATE ${APP_ICON_ICNS})
     set_source_files_properties(${APP_ICON_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    set_target_properties(metrodoro PROPERTIES MACOSX_BUNDLE_ICON_FILE metronome.icns)
+    set_target_properties(metrodoro PROPERTIES
+        MACOSX_BUNDLE_ICON_FILE metronome.icns
+        MACOSX_BUNDLE_GUI_IDENTIFIER org.metrodoro.metrodoro
+        MACOSX_BUNDLE_BUNDLE_NAME Metrodoro
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
+        MACOSX_BUNDLE_COPYRIGHT "Metrodoro"
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in)
 elseif(WIN32)
     set(APP_RC ${CMAKE_CURRENT_BINARY_DIR}/metronome_icon.rc)
     file(WRITE ${APP_RC} "IDI_ICON1 ICON \"${APP_ICON_ICO}\"\n")
