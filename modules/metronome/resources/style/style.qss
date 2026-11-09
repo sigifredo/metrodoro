@@ -356,3 +356,50 @@ QToolTip {
     border: 1px solid #889299;
     padding: 4px 6px;
 }
+
+/* ---- Biblioteca ---------------------------------------------------------- */
+
+QFrame#row {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+QFrame#row QLabel {
+    border: none;
+    background: transparent;
+}
+
+QPushButton#small {
+    background: transparent;
+    color: #F9F9F9;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+QPushButton#small:hover {
+    border-color: #889299;
+}
+
+QPushButton#small:disabled {
+    color: #5c666b;
+    border-color: rgba(255, 255, 255, 0.10);
+}
+
+QMenu {
+    background: #2a2a2a;
+    color: #F9F9F9;
+    border: 1px solid #889299;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 18px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background: #2196F3;
+}

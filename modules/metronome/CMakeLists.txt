@@ -6,6 +6,8 @@ include/ClickConfig.hpp
 include/ClickGenerator.hpp
 include/ClickSynth.hpp
 include/Controls.hpp
+include/LibraryStore.hpp
+include/LibraryTab.hpp
 include/MainWindow.hpp
 include/MetronomeEngine.hpp
 include/MetronomeTab.hpp
@@ -31,6 +33,8 @@ src/ClickConfig.cpp
 src/ClickGenerator.cpp
 src/ClickSynth.cpp
 src/Controls.cpp
+src/LibraryStore.cpp
+src/LibraryTab.cpp
 src/MainWindow.cpp
 src/MetronomeEngine.cpp
 src/MetronomeTab.cpp

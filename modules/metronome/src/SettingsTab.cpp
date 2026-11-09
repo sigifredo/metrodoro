@@ -8,7 +8,6 @@
 // qt
 #include <QCheckBox>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSlider>
@@ -22,16 +21,6 @@ namespace
         label->setObjectName(QStringLiteral("hint"));
         label->setWordWrap(true);
         return label;
-    }
-
-    bool confirm(QWidget *parent, const QString &question)
-    {
-        QMessageBox box(QMessageBox::Question, QStringLiteral("Metrodoro"), question, QMessageBox::NoButton, parent);
-        auto *yes = box.addButton(txt("Aceptar", "OK", "Accepter"), QMessageBox::AcceptRole);
-        box.addButton(txt("Cancelar", "Cancel", "Annuler"), QMessageBox::RejectRole);
-        box.setDefaultButton(yes);
-        box.exec();
-        return box.clickedButton() == yes;
     }
 }
 
@@ -71,9 +60,9 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
     }
 
     page->addWidget(makeCard(txt("Teclado", "Keyboard", "Clavier"), this, &body));
-    body->addWidget(note(txt("Espacio: tocar o pausar\nT: marcar el tempo (TAP)\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Mayús+↑ / ↓: tempo ±5\nCtrl+1, 2, 3, 4: cambiar de pestaña",
-                             "Space: play or pause\nT: tap the tempo\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Shift+↑ / ↓: tempo ±5\nCtrl+1, 2, 3, 4: switch tab",
-                             "Espace : lecture ou pause\nT : marquer le tempo (TAP)\nCtrl+↑ / Ctrl+↓ : tempo ±1\nCtrl+Maj+↑ / ↓ : tempo ±5\nCtrl+1, 2, 3, 4 : changer d'onglet"),
+    body->addWidget(note(txt("Espacio: tocar o pausar\nT: marcar el tempo (TAP)\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Mayús+↑ / ↓: tempo ±5\nCtrl+S: guardar como preajuste\nCtrl+1, 2, 3, 4: cambiar de pestaña",
+                             "Space: play or pause\nT: tap the tempo\nCtrl+↑ / Ctrl+↓: tempo ±1\nCtrl+Shift+↑ / ↓: tempo ±5\nCtrl+S: save as preset\nCtrl+1, 2, 3, 4: switch tab",
+                             "Espace : lecture ou pause\nT : marquer le tempo (TAP)\nCtrl+↑ / Ctrl+↓ : tempo ±1\nCtrl+Maj+↑ / ↓ : tempo ±5\nCtrl+S : enregistrer comme préréglage\nCtrl+1, 2, 3, 4 : changer d'onglet"),
                          this));
 
     page->addWidget(makeCard(txt("Acerca de", "About", "À propos"), this, &body));
@@ -95,11 +84,11 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
     connect(phaseSound_, &QCheckBox::toggled, settings_, &AppSettings::setPhaseSound);
     connect(clearStats, &QPushButton::clicked, this, [this]()
             {
-                if (confirm(this, txt("¿Borrar el tiempo practicado?", "Clear the practiced time?", "Effacer le temps pratiqué ?")))
+                if (confirmDialog(this, txt("¿Borrar el tiempo practicado?", "Clear the practiced time?", "Effacer le temps pratiqué ?")))
                     stats_->clear(); });
     connect(reset, &QPushButton::clicked, this, [this]()
             {
-                if (confirm(this, txt("¿Restablecer los ajustes?", "Reset the settings?", "Réinitialiser les réglages ?")))
+                if (confirmDialog(this, txt("¿Restablecer los ajustes?", "Reset the settings?", "Réinitialiser les réglages ?")))
                     settings_->reset(); });
 
     refresh();

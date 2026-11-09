@@ -1,12 +1,14 @@
 // own
 #include <Controls.hpp>
 #include <RepeatButton.hpp>
+#include <Texts.hpp>
 
 // qt
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QScrollArea>
@@ -129,4 +131,14 @@ QWidget *makeScrollPage(QWidget *content, QWidget *parent)
     area->setWidget(content);
     content->setObjectName(QStringLiteral("pageContent"));
     return area;
+}
+
+bool confirmDialog(QWidget *parent, const QString &question)
+{
+    QMessageBox box(QMessageBox::Question, QStringLiteral("Metrodoro"), question, QMessageBox::NoButton, parent);
+    auto *yes = box.addButton(txt("Aceptar", "OK", "Accepter"), QMessageBox::AcceptRole);
+    box.addButton(txt("Cancelar", "Cancel", "Annuler"), QMessageBox::RejectRole);
+    box.setDefaultButton(yes);
+    box.exec();
+    return box.clickedButton() == yes;
 }

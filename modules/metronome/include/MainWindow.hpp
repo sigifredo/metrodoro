@@ -7,6 +7,8 @@
 // qt
 #include <QWidget>
 
+class LibraryStore;
+class LibraryTab;
 class MetronomeEngine;
 class MetronomeTab;
 class PhaseChime;
@@ -44,12 +46,14 @@ private:
     MetronomeEngine *engine_ = nullptr;
     PracticeSession *session_ = nullptr;
     StatsStore *stats_ = nullptr;
+    LibraryStore *library_ = nullptr;
     PhaseChime *chime_ = nullptr;
 
     TempoPanel *tempo_ = nullptr;
     QTabWidget *tabs_ = nullptr;
     MetronomeTab *metronomeTab_ = nullptr;
     PracticeTab *practiceTab_ = nullptr;
+    LibraryTab *libraryTab_ = nullptr;
     SettingsTab *settingsTab_ = nullptr;
 
     PracticePrefs savedPractice_;

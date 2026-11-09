@@ -70,6 +70,9 @@ QFrame *makeCard(const QString &title, QWidget *parent, QVBoxLayout **body);
 
 QFrame *makeSeparator(QWidget *parent);
 
+/// Pregunta de aceptar o cancelar con los textos de la interfaz.
+bool confirmDialog(QWidget *parent, const QString &question);
+
 /// Envuelve el contenido de una pestaña en un área con desplazamiento sin marco.
 QWidget *makeScrollPage(QWidget *content, QWidget *parent);
 

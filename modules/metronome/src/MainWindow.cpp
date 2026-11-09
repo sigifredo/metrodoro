@@ -1,5 +1,7 @@
 // own
 #include <Controls.hpp>
+#include <LibraryStore.hpp>
+#include <LibraryTab.hpp>
 #include <MainWindow.hpp>
 #include <MetronomeEngine.hpp>
 #include <MetronomeTab.hpp>
@@ -19,7 +21,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), settings_(new AppSettings(this)), engine_(new MetronomeEngine(this)),
-      session_(new PracticeSession(engine_, this)), stats_(new StatsStore(this)), chime_(new PhaseChime(this))
+      session_(new PracticeSession(engine_, this)), stats_(new StatsStore(this)), library_(new LibraryStore(this)), chime_(new PhaseChime(this))
 {
     setWindowTitle(QStringLiteral("Metrodoro"));
     setMinimumSize(900, 660);
@@ -82,10 +84,12 @@ void MainWindow::buildUi()
     tabs_->setUsesScrollButtons(false);
     metronomeTab_ = new MetronomeTab(engine_, settings_, this);
     practiceTab_ = new PracticeTab(engine_, session_, stats_, this);
+    libraryTab_ = new LibraryTab(engine_, session_, library_, this);
     settingsTab_ = new SettingsTab(settings_, stats_, this);
     practiceTab_->setPracticeEnabled(practiceEnabled_);
     tabs_->addTab(makeScrollPage(metronomeTab_, tabs_), txt("Metrónomo", "Metronome", "Métronome"));
     tabs_->addTab(makeScrollPage(practiceTab_, tabs_), txt("Práctica", "Practice", "Pratique"));
+    tabs_->addTab(makeScrollPage(libraryTab_, tabs_), txt("Biblioteca", "Library", "Bibliothèque"));
     tabs_->addTab(makeScrollPage(settingsTab_, tabs_), txt("Ajustes", "Settings", "Réglages"));
     root->addWidget(tabs_, 1);
 
@@ -113,6 +117,10 @@ void MainWindow::buildShortcuts()
     };
     add(Qt::Key_Space, [this]()
         { togglePlayback(); });
+    add(Qt::CTRL | Qt::Key_S, [this]()
+        {
+            tabs_->setCurrentWidget(tabs_->widget(2));
+            libraryTab_->saveCurrentAsPreset(); });
     add(Qt::Key_T, [this]()
         { engine_->tap(); });
     add(Qt::CTRL | Qt::Key_Up, [this]()
