@@ -46,7 +46,7 @@ Detalles que conviene no romper:
 
 - Fondo `#202020`, texto `#F9F9F9`, gris de controles `#889299`, acento azul `#2196F3` (degradado `#64B5F6` a `#1976D2` en el icono SVG) y verde `#6FCF97` para el descanso.
 - Inter para el texto y Hack para las cifras (BPM, reloj, valores, total). Las fuentes se cargan en `main.cpp` desde recursos Qt. Hack solo tiene pesos 400 y 700.
-- Los iconos `.icns` y `.ico` son imágenes y siguen en el color anterior hasta que se regeneren.
+- Los iconos `.icns` y `.ico` son imágenes generadas a partir de `metronome.svg`: si cambia el SVG hay que regenerarlos.
 
 ## Notas de trabajo
 

@@ -70,5 +70,4 @@ La interfaz usa [Inter](https://github.com/rsms/inter) para el texto y [Hack](ht
 
 ## Ideas pendientes
 
-- Regenerar los iconos `.icns` y `.ico` con el color de acento azul.
 - Polirritmos, compases de tamaño mixto (5/8 + 7/8) e importar y exportar preajustes.
