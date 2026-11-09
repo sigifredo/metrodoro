@@ -44,6 +44,8 @@ private:
     QString askName(const QString &title, const QString &initial);
     QString summary(const Preset &preset) const;
     void deletePreset(const Preset &preset);
+    void exportFile();
+    void importFile();
 
     MetronomeEngine *engine_;
     PracticeSession *session_;

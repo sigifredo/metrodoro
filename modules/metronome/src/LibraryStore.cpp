@@ -4,6 +4,7 @@
 // qt
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QHash>
 #include <QUuid>
 
 // std
@@ -180,4 +181,72 @@ void LibraryStore::deleteSetlist(const QString &id)
     setlists_.removeIf([&id](const Setlist &s)
                        { return s.id == id; });
     storeSetlists();
+}
+
+QJsonObject LibraryStore::exportJson() const
+{
+    QJsonArray presets;
+    QHash<QString, int> position;
+    for (const Preset &p : presets_)
+    {
+        position[p.id] = static_cast<int>(presets.size());
+        presets.append(QJsonObject{{"name", p.name}, {"config", p.config.toJson()}});
+    }
+    QJsonArray setlists;
+    for (const Setlist &s : setlists_)
+    {
+        QJsonArray items;
+        for (const SetlistItem &i : s.items)
+        {
+            if (position.contains(i.presetId))
+                items.append(QJsonObject{{"preset", position.value(i.presetId)}, {"bars", i.bars}});
+        }
+        setlists.append(QJsonObject{{"name", s.name}, {"items", items}});
+    }
+    return {{"app", QStringLiteral("metrodoro")}, {"version", 1}, {"presets", presets}, {"setlists", setlists}};
+}
+
+LibraryStore::ImportResult LibraryStore::importJson(const QJsonObject &document)
+{
+    ImportResult result;
+    if (document.value("app").toString() != QLatin1String("metrodoro") || !document.value("presets").isArray())
+        return result;
+    result.valid = true;
+
+    QList<QString> ids;
+    for (const QJsonValue &v : document.value("presets").toArray())
+    {
+        const QJsonObject o = v.toObject();
+        const QString name = o.value("name").toString().trimmed();
+        if (name.isEmpty() || !o.value("config").isObject())
+        {
+            ids << QString();
+            continue;
+        }
+        const Preset p{newId(), name, ClickConfig::fromJson(o.value("config").toObject())};
+        presets_.append(p);
+        ids << p.id;
+        ++result.presets;
+    }
+    for (const QJsonValue &v : document.value("setlists").toArray())
+    {
+        const QJsonObject o = v.toObject();
+        const QString name = o.value("name").toString().trimmed();
+        if (name.isEmpty())
+            continue;
+        Setlist s{newId(), name, {}};
+        for (const QJsonValue &item : o.value("items").toArray())
+        {
+            const int index = item.toObject().value("preset").toInt(-1);
+            if (index >= 0 && index < ids.size() && !ids[index].isEmpty())
+                s.items.append({ids[index], std::clamp(item.toObject().value("bars").toInt(8), 1, 999)});
+        }
+        setlists_.append(s);
+        ++result.setlists;
+    }
+    if (result.presets > 0)
+        storePresets();
+    if (result.setlists > 0)
+        storeSetlists();
+    return result;
 }

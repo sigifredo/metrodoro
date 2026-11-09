@@ -5,6 +5,7 @@
 #include <ClickConfig.hpp>
 
 // qt
+#include <QJsonObject>
 #include <QList>
 #include <QObject>
 #include <QSettings>
@@ -54,6 +55,18 @@ public:
     void renameSetlist(const QString &id, const QString &name);
     void setSetlistItems(const QString &id, const QList<SetlistItem> &items);
     void deleteSetlist(const QString &id);
+
+    /// Todo el contenido como un documento portable (los repertorios enlazan los preajustes por posición).
+    QJsonObject exportJson() const;
+
+    struct ImportResult
+    {
+        int presets = 0;
+        int setlists = 0;
+        bool valid = false;
+    };
+    /// Añade el contenido del documento sin tocar lo existente; los identificadores se generan de nuevo.
+    ImportResult importJson(const QJsonObject &document);
 
 signals:
     void presetsChanged();

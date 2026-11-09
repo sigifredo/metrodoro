@@ -7,6 +7,10 @@
 
 // qt
 #include <QCheckBox>
+#include <QFile>
+#include <QFileDialog>
+#include <QJsonDocument>
+#include <QMessageBox>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
@@ -97,8 +101,14 @@ LibraryTab::LibraryTab(MetronomeEngine *engine, PracticeSession *session, Librar
     auto *save = makeButton(txt("Guardar el actual", "Save current", "Enregistrer l'actuel"), "primary", presetsPage);
     save->setToolTip(QStringLiteral("Ctrl+S"));
     auto *saveRow = new QHBoxLayout;
+    auto *importButton = makeButton(txt("Importar…", "Import…", "Importer…"), "small", presetsPage);
+    auto *exportButton = makeButton(txt("Exportar…", "Export…", "Exporter…"), "small", presetsPage);
+    importButton->setToolTip(txt("Añade preajustes y repertorios desde un archivo", "Adds presets and setlists from a file", "Ajoute des préréglages et répertoires depuis un fichier"));
+    exportButton->setToolTip(txt("Guarda todos los preajustes y repertorios en un archivo", "Saves all presets and setlists to a file", "Enregistre tous les préréglages et répertoires dans un fichier"));
     saveRow->addWidget(save);
     saveRow->addStretch();
+    saveRow->addWidget(importButton);
+    saveRow->addWidget(exportButton);
     presetsColumn->addLayout(saveRow);
     undoBar_ = new QFrame(presetsPage);
     undoBar_->setObjectName(QStringLiteral("banner"));
@@ -160,6 +170,8 @@ LibraryTab::LibraryTab(MetronomeEngine *engine, PracticeSession *session, Librar
     connect(sections_, &ChipRow::activated, this, [this](int i)
             { pages_->setCurrentIndex(i); });
     connect(save, &QPushButton::clicked, this, &LibraryTab::saveCurrentAsPreset);
+    connect(importButton, &QPushButton::clicked, this, &LibraryTab::importFile);
+    connect(exportButton, &QPushButton::clicked, this, &LibraryTab::exportFile);
     connect(create, &QPushButton::clicked, this, [this]()
             {
                 const QString name = askName(txt("Nuevo repertorio", "New setlist", "Nouveau répertoire"), {});
@@ -472,4 +484,47 @@ void LibraryTab::playSetlist(const Setlist &setlist)
     }
     session_->stop();
     engine_->startSetlist(setlist.name, names, steps, loop_);
+}
+
+void LibraryTab::exportFile()
+{
+    if (library_->presets().isEmpty() && library_->setlists().isEmpty())
+    {
+        QMessageBox::information(this, QStringLiteral("Metrodoro"), txt("No hay nada que exportar.", "There is nothing to export.", "Il n'y a rien à exporter."));
+        return;
+    }
+    QString path = QFileDialog::getSaveFileName(this, txt("Exportar biblioteca", "Export library", "Exporter la bibliothèque"),
+                                                QStringLiteral("metrodoro-biblioteca.json"), txt("Archivos JSON (*.json)", "JSON files (*.json)", "Fichiers JSON (*.json)"));
+    if (path.isEmpty())
+        return;
+    if (!path.endsWith(QLatin1String(".json"), Qt::CaseInsensitive))
+        path += QStringLiteral(".json");
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly) || file.write(QJsonDocument(library_->exportJson()).toJson()) < 0)
+    {
+        QMessageBox::warning(this, QStringLiteral("Metrodoro"), txt("No se pudo guardar el archivo.", "The file could not be saved.", "Le fichier n'a pas pu être enregistré."));
+        return;
+    }
+}
+
+void LibraryTab::importFile()
+{
+    const QString path = QFileDialog::getOpenFileName(this, txt("Importar biblioteca", "Import library", "Importer la bibliothèque"), {},
+                                                      txt("Archivos JSON (*.json)", "JSON files (*.json)", "Fichiers JSON (*.json)"));
+    if (path.isEmpty())
+        return;
+    QFile file(path);
+    QJsonParseError error;
+    const QJsonDocument document = file.open(QIODevice::ReadOnly) ? QJsonDocument::fromJson(file.readAll(), &error) : QJsonDocument();
+    const auto result = document.isObject() ? library_->importJson(document.object()) : LibraryStore::ImportResult{};
+    if (!result.valid)
+    {
+        QMessageBox::warning(this, QStringLiteral("Metrodoro"),
+                             txt("El archivo no es una biblioteca de Metrodoro.", "The file is not a Metrodoro library.", "Le fichier n'est pas une bibliothèque Metrodoro."));
+        return;
+    }
+    QMessageBox::information(this, QStringLiteral("Metrodoro"),
+                             txt("Se importaron %1 preajustes y %2 repertorios.", "Imported %1 presets and %2 setlists.", "%1 préréglages et %2 répertoires importés.")
+                                 .arg(result.presets)
+                                 .arg(result.setlists));
 }
