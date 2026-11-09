@@ -53,7 +53,7 @@ private:
     void store();
 
     QSettings settings_;
-    bool flash_ = true;
+    bool flash_ = false;
     bool pendulum_ = false;
     bool phaseSound_ = true;
     float volume_ = 1.0f;

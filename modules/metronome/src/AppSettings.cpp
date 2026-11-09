@@ -10,7 +10,7 @@
 AppSettings::AppSettings(QObject *parent)
     : QObject(parent)
 {
-    flash_ = settings_.value("flash", true).toBool();
+    flash_ = settings_.value("flash", false).toBool();
     pendulum_ = settings_.value("pendulum", false).toBool();
     phaseSound_ = settings_.value("phaseSound", true).toBool();
     volume_ = std::clamp(settings_.value("volume", 1.0).toFloat(), 0.0f, 1.0f);
@@ -67,7 +67,7 @@ void AppSettings::setPauseOnUnplug(bool on)
 
 void AppSettings::reset()
 {
-    flash_ = true;
+    flash_ = false;
     pendulum_ = false;
     phaseSound_ = true;
     volume_ = 1.0f;
