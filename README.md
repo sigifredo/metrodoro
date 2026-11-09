@@ -4,16 +4,36 @@ Metrónomo de escritorio con un **modo práctica tipo pomodoro**: alterna rondas
 
 ## Funciones
 
-- Metrónomo de 10 a 300 BPM con deslizador, botones − y + con repetición, y botón TAP para marcar el tempo con el ritmo.
-- Nombre del tempo en italiano (Largo, Adagio, Allegro…) según el BPM.
-- Compás de 2 a 12 tiempos, con indicador de tiempo actual y acento opcional en el primer tiempo.
-- Subdivisiones: negras, corcheas, semicorcheas, tresillos y shuffle.
-- Sonido sintetizado muestra a muestra, sin archivos de audio.
+- Metrónomo de 20 a 300 BPM con deslizador, botones −1/+1 y −5/+5 con repetición al mantener, cifra editable con un clic, botón TAP (promedia los últimos toques) y nombre del tempo en italiano.
+- Compás de 1 a 16 tiempos con unidad 2, 4, 8 o 16 y atajos de compases habituales (2/4, 3/4, 4/4, 5/4, 6/8, 7/8, 9/8, 12/8) con los acentos agrupados.
+- Acento por tiempo en cuatro niveles (fuerte, medio, débil, silencio): se cambia pulsando cada punto del compás.
+- Subdivisiones: negras, corcheas, tresillos, semicorcheas, quintillos, seisillos, shuffle y dos galopes, con volumen propio.
+- Seis sonidos sintetizados muestra a muestra, sin archivos de audio: Clásico, Madera, Clic, Bip, Hi-hat y Cencerro.
+- Cuenta previa de 0, 1, 2 o 4 compases.
+- Entrenador de velocidad: sube (o baja) X BPM cada N compases hasta una meta.
+- Compases mudos: suena N compases y calla M, también al azar. Los puntos siguen marcando los tiempos, atenuados.
+- Péndulo animado y destello de pantalla opcionales, sincronizados con lo que se oye.
+- Preajustes con nombre y repertorios (listas de preajustes con compases por entrada y avance automático).
+- Estadísticas de constancia: minutos con el metrónomo por día, últimos siete días y racha.
+- Recuerda el último estado del metrónomo y de la sesión de práctica.
 - Interfaz en español, inglés y francés según el idioma del sistema.
+
+## Interfaz y atajos
+
+La ventana tiene dos columnas. A la izquierda va lo que se toca mientras se estudia: tempo, deslizador, tiempos del compás, TAP y play. A la derecha, en pestañas, lo que se cambia poco: Metrónomo (compás, subdivisión, sonido), Práctica (sesión, entrenador, compases mudos y constancia), Biblioteca y Ajustes.
+
+| Atajo | Acción |
+|---|---|
+| Espacio | Tocar o pausar |
+| T | TAP |
+| Ctrl+↑ / Ctrl+↓ | Tempo ±1 |
+| Ctrl+Mayús+↑ / ↓ | Tempo ±5 |
+| Ctrl+S | Guardar como preajuste |
+| Ctrl+1 a 4 | Cambiar de pestaña |
 
 ## Modo práctica
 
-Marca "MODO PRÁCTICA", elige un perfil y pulsa play. La sesión pasa sola de práctica a descanso y de descanso a la siguiente ronda, y avisa con un beep del sistema en cada cambio. Termina tras la última ronda de práctica, sin descanso final. Pausar detiene el reloj y el metrónomo. Cambiar cualquier valor a mitad de sesión la reinicia.
+Marca "MODO PRÁCTICA", elige un perfil y pulsa play. La sesión pasa sola de práctica a descanso y de descanso a la siguiente ronda, y avisa con un tono propio en cada cambio (ascendente al empezar a practicar, descendente al descansar y de tres notas al terminar). Termina tras la última ronda de práctica, sin descanso final. Pausar detiene el reloj y el metrónomo. Cambiar cualquier valor a mitad de sesión la reinicia.
 
 | Perfil | Práctica | Descanso | Rondas | Total | Cuándo usarlo |
 |---|---|---|---|---|---|
@@ -50,6 +70,5 @@ La interfaz usa [Inter](https://github.com/rsms/inter) para el texto y [Hack](ht
 
 ## Ideas pendientes
 
-- Recordar el último perfil y los valores personalizados entre sesiones.
-- Un sonido propio para el cambio de fase en lugar del beep del sistema.
 - Regenerar los iconos `.icns` y `.ico` con el color de acento azul.
+- Polirritmos, compases de tamaño mixto (5/8 + 7/8) e importar y exportar preajustes.
