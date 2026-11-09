@@ -76,14 +76,17 @@ SettingsTab::SettingsTab(AppSettings *settings, StatsStore *stats, QWidget *pare
 
     page->addWidget(makeCard(txt("Acerca de", "About", "À propos"), this, &body));
     body->addWidget(new QLabel(QStringLiteral("Metrodoro %1").arg(QStringLiteral(METRODORO_VERSION)), this));
-    body->addWidget(note(txt("Metrónomo y práctica con descansos. Sin anuncios, sin red y sin telemetría: todo se queda en tu equipo.",
-                             "Metronome and practice with breaks. No ads, no network and no telemetry: everything stays on your computer.",
-                             "Métronome et pratique avec pauses. Sans publicité, sans réseau et sans télémétrie : tout reste sur votre ordinateur."),
-                         this));
-    body->addWidget(note(txt("Tipografías Inter y Hack, con sus licencias en la carpeta de fuentes del proyecto.",
-                             "Inter and Hack typefaces, with their licenses in the project's fonts folder.",
-                             "Polices Inter et Hack, avec leurs licences dans le dossier des polices du projet."),
-                         this));
+    body->addWidget(note(txt("Metrónomo y práctica.", "Metronome and practice.", "Métronome et pratique."), this));
+    auto *author = note(txt("Desarrollado por Sigifredo Escobar Gómez · <a href=\"https://sigifredo.dev/\">sigifredo.dev</a>",
+                            "Developed by Sigifredo Escobar Gómez · <a href=\"https://sigifredo.dev/\">sigifredo.dev</a>",
+                            "Développé par Sigifredo Escobar Gómez · <a href=\"https://sigifredo.dev/\">sigifredo.dev</a>"),
+                        this);
+    author->setTextFormat(Qt::RichText);
+    author->setOpenExternalLinks(true);
+    auto palette = author->palette();
+    palette.setColor(QPalette::Link, QColor(QStringLiteral("#2196F3")));
+    author->setPalette(palette);
+    body->addWidget(author);
     page->addStretch();
 
     connect(pendulum_, &QCheckBox::toggled, settings_, &AppSettings::setPendulum);
