@@ -68,7 +68,7 @@ if(APPLE)
     set_source_files_properties(${APP_ICON_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set_target_properties(metrodoro PROPERTIES
         MACOSX_BUNDLE_ICON_FILE metronome.icns
-        MACOSX_BUNDLE_GUI_IDENTIFIER org.metrodoro.metrodoro
+        MACOSX_BUNDLE_GUI_IDENTIFIER dev.sigifredo.metrodoro
         MACOSX_BUNDLE_BUNDLE_NAME Metrodoro
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}

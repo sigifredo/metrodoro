@@ -14,7 +14,7 @@ Todos los cambios relevantes de Metrodoro se documentan en este archivo. El form
 
 ### Cambiado
 
-- El identificador del bundle de macOS pasa a `org.metrodoro.metrodoro` y el nombre visible a «Metrodoro».
+- El identificador del bundle de macOS pasa a `dev.sigifredo.metrodoro` y el nombre visible a «Metrodoro».
 - La versión pasa de 0.1.0 a 0.2.0.
 
 ## [0.1.0]
