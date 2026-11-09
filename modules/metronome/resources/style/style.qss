@@ -44,6 +44,11 @@ QLabel#hint {
     font-size: 12px;
 }
 
+QLabel#strong {
+    font-size: 15px;
+    font-weight: 600;
+}
+
 QLabel#accent {
     color: #2196F3;
     font-size: 13px;
@@ -55,7 +60,7 @@ QLabel#counter {
 }
 
 QCheckBox {
-    font-size: 11px;
+    font-size: 13px;
     spacing: 8px;
 }
 
@@ -210,6 +215,7 @@ QFrame#card {
 
 QFrame#card QLabel {
     border: none;
+    font-size: 13px;
 }
 
 QLabel#cardTitle {

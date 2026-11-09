@@ -3,13 +3,15 @@
 #include <MainWindow.hpp>
 #include <MetronomeEngine.hpp>
 #include <MetronomeTab.hpp>
+#include <PhaseChime.hpp>
 #include <PracticeSession.hpp>
 #include <PracticeTab.hpp>
+#include <SettingsTab.hpp>
+#include <StatsStore.hpp>
 #include <TempoPanel.hpp>
 #include <Texts.hpp>
 
 // qt
-#include <QApplication>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QShortcut>
@@ -17,11 +19,13 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), settings_(new AppSettings(this)), engine_(new MetronomeEngine(this)),
-      session_(new PracticeSession(engine_, this))
+      session_(new PracticeSession(engine_, this)), stats_(new StatsStore(this)), chime_(new PhaseChime(this))
 {
     setWindowTitle(QStringLiteral("Metrodoro"));
     setMinimumSize(900, 660);
     resize(1080, 740);
+
+    stats_->track(engine_);
 
     // La aplicación arranca donde se dejó.
     engine_->setConfig(settings_->loadConfig());
@@ -42,12 +46,15 @@ MainWindow::MainWindow(QWidget *parent)
             });
     connect(session_, &PracticeSession::changed, this, &MainWindow::onSessionChanged);
     connect(session_, &PracticeSession::runningChanged, this, &MainWindow::updatePlayButton);
-    connect(session_, &PracticeSession::transitioned, this, []()
-            { QApplication::beep(); });
+    connect(session_, &PracticeSession::transitioned, this, [this](PracticeSession::Transition t)
+            {
+                if (settings_->phaseSound())
+                    chime_->play(t != PracticeSession::Transition::ToRest, t == PracticeSession::Transition::Finished ? 3 : 2, settings_->volume()); });
     connect(settings_, &AppSettings::changed, this, [this]()
             {
                 engine_->setVolume(settings_->volume());
                 metronomeTab_->refresh();
+                settingsTab_->refresh();
             });
 
     onConfigChanged();
@@ -74,10 +81,12 @@ void MainWindow::buildUi()
     tabs_->setDocumentMode(true);
     tabs_->setUsesScrollButtons(false);
     metronomeTab_ = new MetronomeTab(engine_, settings_, this);
-    practiceTab_ = new PracticeTab(engine_, session_, this);
+    practiceTab_ = new PracticeTab(engine_, session_, stats_, this);
+    settingsTab_ = new SettingsTab(settings_, stats_, this);
     practiceTab_->setPracticeEnabled(practiceEnabled_);
     tabs_->addTab(makeScrollPage(metronomeTab_, tabs_), txt("Metrónomo", "Metronome", "Métronome"));
     tabs_->addTab(makeScrollPage(practiceTab_, tabs_), txt("Práctica", "Practice", "Pratique"));
+    tabs_->addTab(makeScrollPage(settingsTab_, tabs_), txt("Ajustes", "Settings", "Réglages"));
     root->addWidget(tabs_, 1);
 
     connect(tempo_, &TempoPanel::playClicked, this, &MainWindow::togglePlayback);

@@ -3,12 +3,16 @@
 #include <MetronomeEngine.hpp>
 #include <PracticeSession.hpp>
 #include <PracticeTab.hpp>
+#include <StatsStore.hpp>
 #include <Texts.hpp>
 
 // qt
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QDate>
 #include <QLabel>
+#include <QLocale>
+#include <QPainter>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSignalBlocker>
@@ -44,6 +48,9 @@ namespace
         }
     }
 
+    constexpr int kWeekDays = 7;
+    constexpr int kMinScaleSeconds = 600;
+
     void repolish(QWidget *w)
     {
         w->style()->unpolish(w);
@@ -51,8 +58,67 @@ namespace
     }
 }
 
-PracticeTab::PracticeTab(MetronomeEngine *engine, PracticeSession *session, QWidget *parent)
-    : QWidget(parent), engine_(engine), session_(session)
+/// Minutos con el metrónomo de los últimos siete días, en barras.
+class WeekChart : public QWidget
+{
+public:
+    explicit WeekChart(QWidget *parent) : QWidget(parent)
+    {
+        setMinimumHeight(110);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+
+    void setData(const QList<int> &seconds, const QStringList &labels)
+    {
+        seconds_ = seconds;
+        labels_ = labels;
+        update();
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        if (seconds_.isEmpty())
+            return;
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        QFont small = font();
+        small.setPixelSize(11);
+        painter.setFont(small);
+
+        int top = kMinScaleSeconds;
+        for (int s : seconds_)
+            top = std::max(top, s);
+        const qreal cell = static_cast<qreal>(width()) / seconds_.size();
+        const qreal barWidth = std::min<qreal>(cell * 0.5, 36);
+        const qreal chartTop = 16;
+        const qreal chartBottom = height() - 18;
+        for (int i = 0; i < seconds_.size(); ++i)
+        {
+            const qreal x = i * cell + (cell - barWidth) / 2;
+            const QRectF track(x, chartTop, barWidth, chartBottom - chartTop);
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(QColor(255, 255, 255, 25));
+            painter.drawRoundedRect(track, 4, 4);
+            const qreal h = track.height() * seconds_[i] / top;
+            if (h > 0)
+            {
+                painter.setBrush(QColor(0x21, 0x96, 0xF3));
+                painter.drawRoundedRect(QRectF(x, chartBottom - h, barWidth, h), 4, 4);
+            }
+            painter.setPen(QColor(0x88, 0x92, 0x99));
+            painter.drawText(QRectF(i * cell, 0, cell, chartTop), Qt::AlignCenter, QString::number(seconds_[i] / 60));
+            painter.drawText(QRectF(i * cell, chartBottom + 2, cell, 16), Qt::AlignCenter, labels_.value(i));
+        }
+    }
+
+private:
+    QList<int> seconds_;
+    QStringList labels_;
+};
+
+PracticeTab::PracticeTab(MetronomeEngine *engine, PracticeSession *session, StatsStore *stats, QWidget *parent)
+    : QWidget(parent), engine_(engine), session_(session), stats_(stats)
 {
     auto *page = new QVBoxLayout(this);
     page->setContentsMargins(20, 20, 20, 20);
@@ -147,8 +213,20 @@ PracticeTab::PracticeTab(MetronomeEngine *engine, PracticeSession *session, QWid
     body->addWidget(gapMute_);
     body->addWidget(gapRandom_);
 
+    // Constancia
+    page->addWidget(makeCard(txt("Constancia", "Consistency", "Régularité"), this, &body));
+    today_ = new QLabel(this);
+    today_->setObjectName(QStringLiteral("strong"));
+    streak_ = new QLabel(this);
+    streak_->setObjectName(QStringLiteral("hint"));
+    week_ = new WeekChart(this);
+    body->addWidget(today_);
+    body->addWidget(streak_);
+    body->addWidget(week_);
+
     page->addStretch();
 
+    connect(stats_, &StatsStore::changed, this, &PracticeTab::refreshStats);
     connect(practiceCheck_, &QCheckBox::toggled, this, &PracticeTab::practiceToggled);
     connect(profiles_, &ChipRow::activated, session_, &PracticeSession::setProfile);
     connect(practiceMin_, &StepperRow::stepped, session_, &PracticeSession::changePracticeMinutes);
@@ -197,6 +275,26 @@ PracticeTab::PracticeTab(MetronomeEngine *engine, PracticeSession *session, QWid
 
     refreshSession();
     refreshConfig();
+    refreshStats();
+}
+
+void PracticeTab::refreshStats()
+{
+    const QDate today = QDate::currentDate();
+    QList<int> seconds;
+    QStringList labels;
+    for (int i = kWeekDays - 1; i >= 0; --i)
+    {
+        const QDate day = today.addDays(-i);
+        seconds << stats_->secondsOn(day);
+        labels << QLocale().dayName(day.dayOfWeek(), QLocale::NarrowFormat).toUpper();
+    }
+    today_->setText(txt("Hoy: %1 min con el metrónomo", "Today: %1 min with the metronome", "Aujourd'hui : %1 min avec le métronome")
+                        .arg(stats_->secondsOn(today) / 60));
+    const int streak = streakDays(stats_->days(), today);
+    streak_->setText(streak == 1 ? txt("Racha: 1 día", "Streak: 1 day", "Série : 1 jour")
+                                 : txt("Racha: %1 días", "Streak: %1 days", "Série : %1 jours").arg(streak));
+    week_->setData(seconds, labels);
 }
 
 bool PracticeTab::practiceEnabled() const

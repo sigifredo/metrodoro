@@ -9,9 +9,12 @@
 
 class MetronomeEngine;
 class MetronomeTab;
+class PhaseChime;
 class PracticeSession;
 class PracticeTab;
 class QTabWidget;
+class SettingsTab;
+class StatsStore;
 class QTimer;
 class TempoPanel;
 
@@ -40,11 +43,14 @@ private:
     AppSettings *settings_ = nullptr;
     MetronomeEngine *engine_ = nullptr;
     PracticeSession *session_ = nullptr;
+    StatsStore *stats_ = nullptr;
+    PhaseChime *chime_ = nullptr;
 
     TempoPanel *tempo_ = nullptr;
     QTabWidget *tabs_ = nullptr;
     MetronomeTab *metronomeTab_ = nullptr;
     PracticeTab *practiceTab_ = nullptr;
+    SettingsTab *settingsTab_ = nullptr;
 
     PracticePrefs savedPractice_;
     bool practiceEnabled_ = false;

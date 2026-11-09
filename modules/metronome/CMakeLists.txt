@@ -10,10 +10,13 @@ include/MainWindow.hpp
 include/MetronomeEngine.hpp
 include/MetronomeTab.hpp
 include/PendulumWidget.hpp
+include/PhaseChime.hpp
 include/PlayButton.hpp
 include/PracticeSession.hpp
 include/PracticeTab.hpp
 include/RepeatButton.hpp
+include/SettingsTab.hpp
+include/StatsStore.hpp
 include/SubdivisionSelector.hpp
 include/TapTempo.hpp
 include/TempoPanel.hpp
@@ -32,10 +35,13 @@ src/MainWindow.cpp
 src/MetronomeEngine.cpp
 src/MetronomeTab.cpp
 src/PendulumWidget.cpp
+src/PhaseChime.cpp
 src/PlayButton.cpp
 src/PracticeSession.cpp
 src/PracticeTab.cpp
 src/RepeatButton.cpp
+src/SettingsTab.cpp
+src/StatsStore.cpp
 src/SubdivisionSelector.cpp
 src/TapTempo.cpp
 src/TempoPanel.cpp
@@ -78,6 +84,8 @@ qt_add_resources(metrodoro "metronome_resources"
         resources/fonts/Inter-Medium.ttf
         resources/fonts/Inter-SemiBold.ttf
 )
+
+target_compile_definitions(metrodoro PRIVATE METRODORO_VERSION="${PROJECT_VERSION}")
 
 target_include_directories(metrodoro PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

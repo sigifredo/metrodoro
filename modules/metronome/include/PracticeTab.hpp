@@ -11,6 +11,8 @@ class QCheckBox;
 class QLabel;
 class QProgressBar;
 class QPushButton;
+class StatsStore;
+class WeekChart;
 class StepperRow;
 
 /// Modo práctica tipo pomodoro, entrenador de velocidad y compases mudos.
@@ -19,7 +21,7 @@ class PracticeTab : public QWidget
     Q_OBJECT
 
 public:
-    PracticeTab(MetronomeEngine *engine, PracticeSession *session, QWidget *parent = nullptr);
+    PracticeTab(MetronomeEngine *engine, PracticeSession *session, StatsStore *stats, QWidget *parent = nullptr);
 
     bool practiceEnabled() const;
     void setPracticeEnabled(bool enabled);
@@ -27,6 +29,8 @@ public:
     void refreshSession();
     /// Redibuja el entrenador y los compases mudos.
     void refreshConfig();
+    /// Redibuja las estadísticas de constancia.
+    void refreshStats();
 
 signals:
     void practiceToggled(bool enabled);
@@ -36,6 +40,7 @@ signals:
 private:
     MetronomeEngine *engine_;
     PracticeSession *session_;
+    StatsStore *stats_;
 
     QCheckBox *practiceCheck_ = nullptr;
     ChipRow *profiles_ = nullptr;
@@ -60,6 +65,10 @@ private:
     StepperRow *gapPlay_ = nullptr;
     StepperRow *gapMute_ = nullptr;
     QCheckBox *gapRandom_ = nullptr;
+
+    QLabel *today_ = nullptr;
+    QLabel *streak_ = nullptr;
+    WeekChart *week_ = nullptr;
 };
 
 #endif // PRACTICETAB_HPP
