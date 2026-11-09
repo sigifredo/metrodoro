@@ -208,7 +208,8 @@ void MainWindow::buildTray()
     menu->addAction(txt("Tocar / pausar", "Play / pause", "Lecture / pause"), this, &MainWindow::togglePlayback);
     menu->addAction(txt("Mostrar Metrodoro", "Show Metrodoro", "Afficher Metrodoro"), this, [this]()
                     {
-                        showNormal();
+                        setWindowState(windowState() & ~Qt::WindowMinimized);
+                        show();
                         raise();
                         activateWindow(); });
     menu->addSeparator();

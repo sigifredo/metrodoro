@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 
     MainWindow window;
     window.resize(480, 920);
-    window.show();
+    window.showMaximized();
 
     return app.exec();
 }
