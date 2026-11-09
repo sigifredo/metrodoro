@@ -23,7 +23,7 @@ void RepeatButton::paintEvent(QPaintEvent *)
     painter.drawEllipse(rect().adjusted(1, 1, -1, -1));
 
     QFont f = font();
-    f.setPixelSize(22);
+    f.setPixelSize(text().size() > 1 ? 14 : 22);
     f.setWeight(QFont::Medium);
     painter.setFont(f);
     painter.setPen(palette().buttonText().color());

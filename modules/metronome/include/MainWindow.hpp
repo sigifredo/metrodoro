@@ -1,19 +1,24 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+// own
+#include <AppSettings.hpp>
+
 // qt
 #include <QWidget>
 
-class BeatDotsWidget;
 class MetronomeEngine;
-class NoteSelectorWidget;
-class PlayButton;
+class MetronomeTab;
 class PracticeSession;
-class QComboBox;
-class QCheckBox;
-class QLabel;
-class QSlider;
+class PracticeTab;
+class QTabWidget;
+class QTimer;
+class TempoPanel;
 
+/**
+ * Ventana de escritorio. A la izquierda va lo que se toca mientras se estudia (tempo, tiempos, TAP y play);
+ * a la derecha, en pestañas, lo que se cambia poco. Todo se maneja también con el teclado.
+ */
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -23,30 +28,26 @@ public:
 
 private:
     void buildUi();
-    void updateBpm();
-    void updatePractice();
+    void buildShortcuts();
+    void onConfigChanged();
+    void onSessionChanged();
+    void updatePlayButton();
+    /// Con el modo práctica activo manda la sesión; si no, el motor.
+    void togglePlayback();
+    void stopAll();
+    void persistPractice();
 
+    AppSettings *settings_ = nullptr;
     MetronomeEngine *engine_ = nullptr;
-
-    QLabel *bpmLabel_ = nullptr;
-    QLabel *tempoLabel_ = nullptr;
-    QSlider *slider_ = nullptr;
-    BeatDotsWidget *dots_ = nullptr;
-    PlayButton *playButton_ = nullptr;
-    QCheckBox *accentCheck_ = nullptr;
-    QLabel *measureLabel_ = nullptr;
-    NoteSelectorWidget *notes_ = nullptr;
-
     PracticeSession *session_ = nullptr;
-    QCheckBox *practiceCheck_ = nullptr;
-    QComboBox *profileCombo_ = nullptr;
-    QWidget *practiceBody_ = nullptr;
-    QLabel *phaseLabel_ = nullptr;
-    QLabel *countdownLabel_ = nullptr;
-    QLabel *practiceMinLabel_ = nullptr;
-    QLabel *restMinLabel_ = nullptr;
-    QLabel *roundsLabel_ = nullptr;
-    QLabel *totalLabel_ = nullptr;
+
+    TempoPanel *tempo_ = nullptr;
+    QTabWidget *tabs_ = nullptr;
+    MetronomeTab *metronomeTab_ = nullptr;
+    PracticeTab *practiceTab_ = nullptr;
+
+    PracticePrefs savedPractice_;
+    bool practiceEnabled_ = false;
 };
 
 #endif // MAINWINDOW_HPP

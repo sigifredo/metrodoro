@@ -26,6 +26,14 @@ public:
         Done
     };
 
+    /// Cambio de fase ocurrido mientras corría la sesión.
+    enum class Transition
+    {
+        ToRest,
+        ToPractice,
+        Finished
+    };
+
     struct Profile
     {
         const char *id;
@@ -52,6 +60,8 @@ public:
     int rounds() const { return rounds_; }
     int remainingSeconds() const;
     int totalMinutes() const;
+    /// Duración en segundos de la fase actual (para la barra de progreso).
+    int phaseSeconds() const { return (phase_ == Phase::Rest ? restMin_ : practiceMin_) * 60; }
     /// Índice del perfil que coincide con la configuración actual, o `profiles().size()` si es personalizada.
     int matchingProfile() const;
 
@@ -59,6 +69,7 @@ public slots:
     void toggle();
     void stop();
 
+    void configure(int practiceMin, int restMin, int rounds);
     void setProfile(int index);
     void changePracticeMinutes(int delta);
     void changeRestMinutes(int delta);
@@ -69,7 +80,7 @@ signals:
     void changed();
     void runningChanged(bool running);
     /// Pasó de una fase a otra mientras corría (para avisar al usuario).
-    void transitioned();
+    void transitioned(PracticeSession::Transition transition);
 
 private:
     void start();

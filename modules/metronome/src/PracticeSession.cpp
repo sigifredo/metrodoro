@@ -94,7 +94,7 @@ void PracticeSession::pause()
     pausedLeftMs_ = phaseEndMs_ - clock_.elapsed();
     tick_.stop();
     if (phase_ == Phase::Practice)
-        engine_->playPause();
+        engine_->stop();
     setRunning(false);
     emit changed();
 }
@@ -104,7 +104,7 @@ void PracticeSession::resume()
     phaseEndMs_ = clock_.elapsed() + pausedLeftMs_;
     tick_.start();
     if (phase_ == Phase::Practice)
-        engine_->playPause();
+        engine_->start();
     setRunning(true);
     emit changed();
 }
@@ -123,7 +123,7 @@ void PracticeSession::beginPhase(Phase phase, int seconds)
 void PracticeSession::enterPractice()
 {
     engine_->stop();
-    engine_->playPause();
+    engine_->start();
     beginPhase(Phase::Practice, practiceMin_ * 60);
 }
 
@@ -150,19 +150,27 @@ void PracticeSession::onTick()
         return;
     }
 
+    Transition transition;
     if (phase_ == Phase::Practice)
     {
         if (round_ >= rounds_)
+        {
             finish();
+            transition = Transition::Finished;
+        }
         else
+        {
             enterRest();
+            transition = Transition::ToRest;
+        }
     }
     else
     {
         ++round_;
         enterPractice();
+        transition = Transition::ToPractice;
     }
-    emit transitioned();
+    emit transitioned(transition);
 }
 
 void PracticeSession::setRunning(bool running)
@@ -174,6 +182,14 @@ void PracticeSession::setRunning(bool running)
 }
 
 /* ---- Configuración ------------------------------------------------------- */
+
+void PracticeSession::configure(int practiceMin, int restMin, int rounds)
+{
+    practiceMin_ = std::clamp(practiceMin, kMinMinutes, kMaxPracticeMin);
+    restMin_ = std::clamp(restMin, kMinMinutes, kMaxRestMin);
+    rounds_ = std::clamp(rounds, 1, kMaxRounds);
+    configChanged();
+}
 
 void PracticeSession::setProfile(int index)
 {

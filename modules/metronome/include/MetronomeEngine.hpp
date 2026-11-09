@@ -1,89 +1,116 @@
 #ifndef METRONOMEENGINE_HPP
 #define METRONOMEENGINE_HPP
 
+// own
+#include <ClickConfig.hpp>
+#include <ClickGenerator.hpp>
+#include <TapTempo.hpp>
+
 // qt
 #include <QElapsedTimer>
 #include <QObject>
 #include <QTimer>
 
+// std
+#include <deque>
+#include <functional>
 #include <memory>
+#include <optional>
 
-class ClickGenerator;
 class QAudioSink;
 
+/// Lo que está sonando ahora; la interfaz lo usa para los puntos, el péndulo y el destello.
+struct LiveState
+{
+    int beat = -1;
+    int bar = 0;
+    int bpm = 0;
+    bool muted = false;
+    bool countIn = false;
+    /// Contador de pulsos: cambia en cada tiempo aunque el resto sea igual.
+    qint64 seq = 0;
+};
+
+/// Un repertorio en marcha: los pasos, sus nombres y cuál suena.
+struct SetlistRun
+{
+    QString name;
+    QStringList names;
+    QList<SequenceStep> steps;
+    int segment = 0;
+};
+
 /**
- * Estado y reglas del metrónomo (BPM, compás, subdivisión, TAP)
- * más el control de reproducción. Equivale al `metronome` directive del web.
+ * Estado y reglas del metrónomo (configuración, TAP, repertorio) más el control de reproducción.
+ * Los pulsos se entregan cuando la posición de reproducción alcanza su muestra, para que puntos,
+ * péndulo y destello coincidan con lo que se oye.
  */
 class MetronomeEngine : public QObject
 {
     Q_OBJECT
 
 public:
-    static constexpr int kSliderMin = 20;
-    static constexpr int kSliderMax = 300;
-
     explicit MetronomeEngine(QObject *parent = nullptr);
     ~MetronomeEngine() override;
 
-    int bpm() const { return bpm_; }
-    int timeInMeasure() const { return timeInMeasure_; }
-    int subdivision() const { return dec_; }
-    bool shuffle() const { return shuffle_; }
-    bool accentFirstBeat() const { return accentFirst_; }
-    bool playing() const { return playing_; }
-    int currentBeat() const { return currentBeat_; }
+    const ClickConfig &config() const { return config_; }
+    bool running() const { return running_; }
+    const LiveState &live() const { return live_; }
+    const std::optional<SetlistRun> &setlistRun() const { return setlistRun_; }
+    float volume() const { return volume_; }
 
-    /// Nombres de tempo (italiano) que cubren el BPM dado.
-    static QStringList tempoLabels(int bpm);
+    /// Tempo que se muestra: el del pulso durante el entrenador, el configurado si está parado.
+    /// Aplica una transformación a la configuración actual.
+    void edit(const std::function<ClickConfig(const ClickConfig &)> &transform);
+
+    int shownBpm() const { return running_ && live_.bpm > 0 ? live_.bpm : config_.bpm; }
 
 public slots:
+    /// Cambia la configuración. Si sonaba un repertorio, se sale de él y se sigue con lo editado.
+    void setConfig(const ClickConfig &config);
     void setBpm(int bpm);
     void startBpmRepeat(int step);
     void stopBpmRepeat();
     void tap();
+    void setVolume(float volume);
 
-    void changeTimeInMeasure(int delta);
-    void setSubdivision(int dec, bool shuffle);
-    void setAccentFirstBeat(bool accent);
-
-    void playPause();
+    void start();
     void stop();
+    void toggle();
+
+    bool startSetlist(const QString &name, const QStringList &names, const QList<SequenceStep> &steps, bool loop);
+    void exitSetlist();
 
 signals:
-    void bpmChanged(int bpm);
-    void timeInMeasureChanged(int count);
-    void subdivisionChanged();
-    void accentFirstBeatChanged(bool accent);
-    void playingChanged(bool playing);
-    void beatChanged(int index);
+    void configChanged();
+    void runningChanged(bool running);
+    void pulse(const LiveState &live);
+    void setlistChanged();
 
 private:
-    void play();
-    void resume();
-    void pause();
-    void restartIfRunning();
-    void applyBpmStep(int step);
+    void applyConfig(const ClickConfig &config);
+    void pollPulses();
+    void handlePulse(const Pulse &pulse);
 
     std::unique_ptr<ClickGenerator> generator_;
     std::unique_ptr<QAudioSink> sink_;
 
-    int bpm_ = 60;
-    int timeInMeasure_ = 2;
-    int dec_ = 1;
-    bool shuffle_ = false;
-    bool accentFirst_ = false;
+    ClickConfig config_;
+    bool running_ = false;
+    LiveState live_;
+    std::optional<SetlistRun> setlistRun_;
+    float volume_ = 1.0f;
 
-    bool started_ = false;
-    bool playing_ = false;
-    int currentBeat_ = -1;
+    std::deque<Pulse> due_;
+    QTimer pollTimer_;
+    qint64 pulseSeq_ = 0;
 
     QTimer repeatTimer_;
     int repeatStep_ = 0;
     int repeatCount_ = 0;
 
-    QElapsedTimer tapClock_;
-    qint64 lastTapMs_ = -1;
+    QElapsedTimer clock_;
+    TapTempo tapTempo_;
 };
 
 #endif // METRONOMEENGINE_HPP
