@@ -7,6 +7,9 @@
 #include <QString>
 #include <QStringList>
 
+// std
+#include <optional>
+
 /// Intensidad de un tiempo del compás.
 enum class Accent
 {
@@ -87,6 +90,8 @@ struct ClickConfig
     int beats = 4;
     int unit = 4;
     QList<Accent> accents;
+    /// Tamaños de los grupos de tiempos (5+7, 2+2+3...). Vacío: los habituales del compás.
+    QList<int> groups;
     Subdivision subdivision = Subdivision::Quarter;
     float subVolume = 0.5f;
     ClickSound sound = ClickSound::Classic;
@@ -102,7 +107,11 @@ struct ClickConfig
     ClickConfig withBeats(int n) const;
     /// Fija el compás completo y reinicia los acentos agrupados según el compás.
     ClickConfig withSignature(int beats, int unit) const;
+    /// Compás de tamaño mixto: los tiempos son la suma de los grupos y cada grupo empieza con acento medio.
+    ClickConfig withGroups(const QList<int> &groups) const;
     ClickConfig withBpm(int value) const;
+    /// Los grupos en uso: los personalizados o los habituales del compás.
+    QList<int> effectiveGroups() const;
 
     QJsonObject toJson() const;
     static ClickConfig fromJson(const QJsonObject &object);
@@ -111,7 +120,12 @@ struct ClickConfig
 /// Tamaños de los grupos de tiempos de un compás: 6/8 es 3+3, 7/8 es 2+2+3, 5/4 es 3+2.
 QList<int> beatGroups(int beats, int unit);
 /// Fuerte en el primer tiempo, medio al inicio de cada grupo y débil en el resto.
-QList<Accent> defaultAccents(int beats, int unit);
+/// Con `groups` que sumen `beats` se usan esos grupos en lugar de los habituales.
+QList<Accent> defaultAccents(int beats, int unit, const QList<int> &groups = {});
+/// Lee grupos escritos como "5+7". Devuelve nada si hay algo inválido o suman más de 16 tiempos.
+std::optional<QList<int>> parseGroups(const QString &text);
+/// Escribe los grupos como "5+7".
+QString groupsText(const QList<int> &groups);
 /// Nombres italianos del tempo; los rangos se solapan, así que puede haber varios.
 QStringList tempoNames(int bpm);
 

@@ -9,6 +9,7 @@
 // qt
 #include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QSignalBlocker>
 #include <QSlider>
 #include <QVBoxLayout>
@@ -44,6 +45,20 @@ MetronomeTab::MetronomeTab(MetronomeEngine *engine, AppSettings *settings, QWidg
         signatureLabels << QStringLiteral("%1/%2").arg(s.first).arg(s.second);
     signatures_ = new ChipRow(signatureLabels, this);
     body->addWidget(signatures_);
+    body->addWidget(new QLabel(txt("Grupos de tiempos (compás mixto)", "Beat groups (mixed meter)", "Groupes de temps (mesure mixte)"), this));
+    groups_ = new QLineEdit(this);
+    groups_->setMaximumWidth(180);
+    groups_->setToolTip(txt("Por ejemplo 5+7 o 2+2+3. Vacío: grupos habituales del compás.",
+                            "For example 5+7 or 2+2+3. Empty: the usual groups for the signature.",
+                            "Par exemple 5+7 ou 2+2+3. Vide : groupes habituels de la mesure."));
+    body->addWidget(groups_);
+    auto *groupsHint = new QLabel(txt("Cada grupo empieza con acento medio. Ej.: 5+7 o 2+2+3; vacío es automático.",
+                                      "Each group starts with a medium accent. E.g. 5+7 or 2+2+3; empty is automatic.",
+                                      "Chaque groupe commence par un accent moyen. Ex. 5+7 ou 2+2+3 ; vide est automatique."),
+                                  this);
+    groupsHint->setObjectName(QStringLiteral("hint"));
+    groupsHint->setWordWrap(true);
+    body->addWidget(groupsHint);
 
     // Subdivisión
     page->addWidget(makeCard(txt("Subdivisión", "Subdivision", "Subdivision"), this, &body));
@@ -84,11 +99,27 @@ MetronomeTab::MetronomeTab(MetronomeEngine *engine, AppSettings *settings, QWidg
                             {
                                 ClickConfig next = c;
                                 next.unit = unit;
-                                next.accents = defaultAccents(c.beats, unit);
+                                next.accents = defaultAccents(c.beats, unit, c.groups);
                                 return next; }); });
     connect(signatures_, &ChipRow::activated, this, [this](int i)
             { engine_->edit([s = kSignatures[i]](const ClickConfig &c)
                             { return c.withSignature(s.first, s.second); }); });
+    connect(groups_, &QLineEdit::editingFinished, this, [this]()
+            {
+                const QString text = groups_->text().trimmed();
+                if (text.isEmpty())
+                {
+                    engine_->edit([](const ClickConfig &c)
+                                  { return c.withSignature(c.beats, c.unit); });
+                }
+                else if (const auto parsed = parseGroups(text))
+                {
+                    engine_->edit([g = *parsed](const ClickConfig &c)
+                                  { return c.withGroups(g); });
+                }
+                const QList<int> now = engine_->config().groups;
+                groups_->setText(now.isEmpty() ? QString() : groupsText(now));
+                refresh(); });
     connect(subdivisions_, &SubdivisionSelector::selected, this, [this](Subdivision s)
             { engine_->edit([s](const ClickConfig &c)
                             {
@@ -129,7 +160,10 @@ void MetronomeTab::refresh()
         if (kSignatures[i].first == c.beats && kSignatures[i].second == c.unit)
             signature = i;
     }
-    signatures_->setCurrent(signature);
+    signatures_->setCurrent(c.groups.isEmpty() ? signature : -1);
+    if (!groups_->hasFocus())
+        groups_->setText(c.groups.isEmpty() ? QString() : groupsText(c.groups));
+    groups_->setPlaceholderText(groupsText(beatGroups(c.beats, c.unit)));
     subdivisions_->setSelection(c.subdivision);
     sounds_->setCurrent(static_cast<int>(c.sound));
     countIn_->setCurrent(static_cast<int>(ClickConfig::kCountIns.indexOf(c.countInBars)));

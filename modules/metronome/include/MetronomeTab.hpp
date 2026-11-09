@@ -8,6 +8,7 @@ class AppSettings;
 class ChipRow;
 class MetronomeEngine;
 class QCheckBox;
+class QLineEdit;
 class QSlider;
 class StepperRow;
 class SubdivisionSelector;
@@ -29,6 +30,7 @@ private:
     StepperRow *beats_ = nullptr;
     ChipRow *units_ = nullptr;
     ChipRow *signatures_ = nullptr;
+    QLineEdit *groups_ = nullptr;
     SubdivisionSelector *subdivisions_ = nullptr;
     ChipRow *sounds_ = nullptr;
     QSlider *subVolume_ = nullptr;

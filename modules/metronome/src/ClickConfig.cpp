@@ -99,6 +99,7 @@ ClickConfig ClickConfig::withBeats(int n) const
     const QList<Accent> fresh = defaultAccents(count, unit);
     ClickConfig result = *this;
     result.beats = count;
+    result.groups.clear();
     result.accents.clear();
     for (int i = 0; i < count; ++i)
         result.accents << (i < accents.size() && i != 0 ? accents[i] : fresh[i]);
@@ -110,8 +111,28 @@ ClickConfig ClickConfig::withSignature(int newBeats, int newUnit) const
     ClickConfig result = *this;
     result.beats = std::clamp(newBeats, kMinBeats, kMaxBeats);
     result.unit = newUnit;
+    result.groups.clear();
     result.accents = defaultAccents(result.beats, newUnit);
     return result;
+}
+
+ClickConfig ClickConfig::withGroups(const QList<int> &newGroups) const
+{
+    int total = 0;
+    for (int g : newGroups)
+        total += g;
+    ClickConfig result = *this;
+    if (newGroups.isEmpty() || total < kMinBeats || total > kMaxBeats)
+        return result;
+    result.beats = total;
+    result.groups = newGroups;
+    result.accents = defaultAccents(total, unit, newGroups);
+    return result;
+}
+
+QList<int> ClickConfig::effectiveGroups() const
+{
+    return groups.isEmpty() ? beatGroups(beats, unit) : groups;
 }
 
 ClickConfig ClickConfig::withBpm(int value) const
@@ -131,6 +152,7 @@ QJsonObject ClickConfig::toJson() const
         {"beats", beats},
         {"unit", unit},
         {"accents", accentArray},
+        {"groups", QJsonArray::fromVariantList(QVariantList(groups.cbegin(), groups.cend()))},
         {"sub", QLatin1String(kSubdivisionNames[static_cast<int>(subdivision)])},
         {"subVol", static_cast<double>(subVolume)},
         {"sound", QLatin1String(kSoundNames[static_cast<int>(sound)])},
@@ -165,6 +187,21 @@ ClickConfig ClickConfig::fromJson(const QJsonObject &o)
         c.accents = defaultAccents(c.beats, c.unit);
     }
 
+    QList<int> savedGroups;
+    int groupTotal = 0;
+    for (const QJsonValue &v : o.value("groups").toArray())
+    {
+        savedGroups << v.toInt();
+        groupTotal += v.toInt();
+    }
+    const bool validGroups = !savedGroups.isEmpty() && groupTotal == c.beats && !savedGroups.contains(0) &&
+                             std::all_of(savedGroups.cbegin(), savedGroups.cend(), [](int g)
+                                         { return g > 0; });
+    if (validGroups)
+        c.groups = savedGroups;
+    if (saved.size() != c.beats)
+        c.accents = defaultAccents(c.beats, c.unit, c.groups);
+
     c.bpm = std::clamp(o.value("bpm").toInt(d.bpm), kMinBpm, kMaxBpm);
     c.subdivision = enumFromName(o.value("sub").toString(), kSubdivisionNames, d.subdivision);
     c.subVolume = std::clamp(static_cast<float>(o.value("subVol").toDouble(d.subVolume)), 0.0f, 1.0f);
@@ -197,11 +234,14 @@ QList<int> beatGroups(int beats, int unit)
     return {beats};
 }
 
-QList<Accent> defaultAccents(int beats, int unit)
+QList<Accent> defaultAccents(int beats, int unit, const QList<int> &custom)
 {
     QList<Accent> result(beats, Accent::Weak);
     int start = 0;
-    const QList<int> groups = beatGroups(beats, unit);
+    int customTotal = 0;
+    for (int g : custom)
+        customTotal += g;
+    const QList<int> groups = !custom.isEmpty() && customTotal == beats ? custom : beatGroups(beats, unit);
     for (int i = 0; i < groups.size(); ++i)
     {
         if (start < beats)
@@ -220,4 +260,30 @@ QStringList tempoNames(int bpm)
             names << QString::fromLatin1(tempo.name);
     }
     return names;
+}
+
+std::optional<QList<int>> parseGroups(const QString &text)
+{
+    QList<int> groups;
+    int total = 0;
+    for (const QString &part : text.split(QLatin1Char('+'), Qt::SkipEmptyParts))
+    {
+        bool ok = false;
+        const int n = part.trimmed().toInt(&ok);
+        if (!ok || n < 1)
+            return std::nullopt;
+        groups << n;
+        total += n;
+    }
+    if (groups.isEmpty() || total > ClickConfig::kMaxBeats)
+        return std::nullopt;
+    return groups;
+}
+
+QString groupsText(const QList<int> &groups)
+{
+    QStringList parts;
+    for (int g : groups)
+        parts << QString::number(g);
+    return parts.join(QLatin1Char('+'));
 }
