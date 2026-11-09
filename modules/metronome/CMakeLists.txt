@@ -1,4 +1,7 @@
 set(HDRS
+include/BarPlanner.hpp
+include/ClickConfig.hpp
+include/TapTempo.hpp
 include/ClickGenerator.hpp
 include/MainWindow.hpp
 include/MetronomeEngine.hpp
@@ -10,6 +13,9 @@ include/PracticeSession.hpp
 )
 
 set(SRCS
+src/BarPlanner.cpp
+src/ClickConfig.cpp
+src/TapTempo.cpp
 src/ClickGenerator.cpp
 src/MainWindow.cpp
 src/MetronomeEngine.cpp
