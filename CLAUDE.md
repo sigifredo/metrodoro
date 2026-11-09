@@ -35,6 +35,7 @@ Detalles que conviene no romper:
 - Los compases mudos siguen mostrando los tiempos, atenuados, para no perder el sitio.
 - Todo texto nuevo va en español, inglés y francés con `txt(es, en, fr)` (`Texts.hpp`), que elige según `QLocale()`.
 - El motor crea el `QAudioSink` de nuevo en `start()` si cambió la salida predeterminada, y `MainWindow` pausa (no reinicia) si la salida en uso desaparece (`outputAvailable()`), como el pausar al desconectar auriculares de Android.
+- El `Info.plist` del bundle de macOS sale de `modules/metronome/resources/Info.plist.in` (no de la plantilla por defecto de CMake). El identificador es `dev.sigifredo.metrodoro` y la versión sale de `project(... VERSION ...)` en el `CMakeLists.txt` raíz; al subirla, actualiza también `CHANGELOG.md`.
 - Lo que solo tiene sentido en móvil no se portó: servicio en primer plano, notificación, botones de auriculares, vibración y tema claro/oscuro del sistema. El equivalente de escritorio es el icono de bandeja, la pausa al perder la salida de audio y el bloqueo de suspensión.
 
 ## Estilo de código

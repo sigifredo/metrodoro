@@ -13,7 +13,7 @@ Metrónomo de escritorio con un **modo práctica tipo pomodoro**: alterna rondas
 - Cuenta previa de 0, 1, 2 o 4 compases.
 - Entrenador de velocidad: sube (o baja) X BPM cada N compases hasta una meta.
 - Compases mudos: suena N compases y calla M, también al azar. Los puntos siguen marcando los tiempos, atenuados.
-- Péndulo animado y destello de pantalla opcionales, sincronizados con lo que se oye.
+- Péndulo animado y destello de pantalla opcionales (vienen apagados), sincronizados con lo que se oye.
 - Preajustes con nombre y repertorios (listas de preajustes con compases por entrada y avance automático), que se pueden importar y exportar como archivo JSON.
 - Icono en la bandeja del sistema (clic para tocar o pausar), pausa si se pierde la salida de audio (por ejemplo, al desconectar unos auriculares) y, en Linux, evita que el equipo se suspenda mientras suena.
 - Estadísticas de constancia: minutos con el metrónomo por día, últimos siete días y racha.
@@ -64,7 +64,7 @@ En Linux y Windows el ejecutable queda en `build/bin/metrodoro`. Si Qt no está 
 
 - `config/`: opciones de compilación y dependencias de CMake.
 - `modules/metronome/include` y `src`: código de la aplicación.
-- `modules/metronome/resources`: iconos, hoja de estilos `style.qss` y fuentes.
+- `modules/metronome/resources`: iconos, hoja de estilos `style.qss`, fuentes y la plantilla `Info.plist.in` del bundle de macOS.
 
 ## Fuentes y licencias
 
