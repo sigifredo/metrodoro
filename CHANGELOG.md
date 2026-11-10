@@ -2,6 +2,16 @@
 
 Todos los cambios relevantes de Metrodoro se documentan en este archivo. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [0.2.3] - 2026-11-10
+
+### Corregido
+
+- Se quitó el icono de la bandeja del sistema.
+
+### Cambiado
+
+- La versión pasa de 0.2.2 a 0.2.3.
+
 ## [0.2.2] - 2026-11-09
 
 ### Corregido
