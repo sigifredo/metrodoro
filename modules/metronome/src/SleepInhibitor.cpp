@@ -50,7 +50,7 @@ void SleepInhibitor::setActive(bool active)
     {
         IOPMAssertionID id = 0;
         const CFStringRef reason = CFSTR("Metrodoro: metronome playing");
-        if (IOPMAssertionCreateWithName(kIOPMAssertionTypePreventUserIdleSystemSleep, kIOPMAssertionLevelOn, reason, &id) !=
+        if (IOPMAssertionCreateWithName(kIOPMAssertionTypePreventUserIdleDisplaySleep, kIOPMAssertionLevelOn, reason, &id) !=
             kIOReturnSuccess)
             return;
         assertion_ = id;
@@ -62,7 +62,7 @@ void SleepInhibitor::setActive(bool active)
     }
 #endif
 #ifdef Q_OS_WIN
-    SetThreadExecutionState(active ? (ES_CONTINUOUS | ES_SYSTEM_REQUIRED) : ES_CONTINUOUS);
+    SetThreadExecutionState(active ? (ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED) : ES_CONTINUOUS);
 #endif
     active_ = active;
 }
