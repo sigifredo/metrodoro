@@ -2,6 +2,16 @@
 
 Todos los cambios relevantes de Metrodoro se documentan en este archivo. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [0.2.2] - 2026-11-09
+
+### Corregido
+
+- Mientras suena el metrónomo o corre la sesión de práctica, la pantalla ya no se apaga ni aparece el protector de pantalla en macOS (aserción de pantalla de IOKit) y Windows (`ES_DISPLAY_REQUIRED`).
+
+### Cambiado
+
+- La versión pasa de 0.2.1 a 0.2.2.
+
 ## [0.2.1] - 2026-11-09
 
 ### Corregido
