@@ -8,19 +8,11 @@ Todos los cambios relevantes de Metrodoro se documentan en este archivo. El form
 
 - Se quitó el icono de la bandeja del sistema.
 
-### Cambiado
-
-- La versión pasa de 0.2.2 a 0.2.3.
-
 ## [0.2.2] - 2026-11-09
 
 ### Corregido
 
 - Mientras suena el metrónomo o corre la sesión de práctica, la pantalla ya no se apaga ni aparece el protector de pantalla en macOS (aserción de pantalla de IOKit) y Windows (`ES_DISPLAY_REQUIRED`).
-
-### Cambiado
-
-- La versión pasa de 0.2.1 a 0.2.2.
 
 ## [0.2.1] - 2026-11-09
 
@@ -28,10 +20,6 @@ Todos los cambios relevantes de Metrodoro se documentan en este archivo. El form
 
 - El bloqueo de suspensión mientras suena el metrónomo o corre la sesión de práctica solo funcionaba en Linux; ahora también funciona en macOS (IOKit) y Windows (`SetThreadExecutionState`).
 - Los atajos de teclado se muestran con «Cmd» en lugar de «Ctrl» en macOS (Ajustes, Biblioteca y deslizador de tempo).
-
-### Cambiado
-
-- La versión pasa de 0.2.0 a 0.2.1.
 
 ## [0.2.0] - 2026-11-09
 
