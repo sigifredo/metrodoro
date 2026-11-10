@@ -15,7 +15,6 @@ class PhaseChime;
 class PracticeSession;
 class PracticeTab;
 class QMediaDevices;
-class QSystemTrayIcon;
 class QTabWidget;
 class SettingsTab;
 class SleepInhibitor;
@@ -44,8 +43,6 @@ private:
     void togglePlayback();
     void stopAll();
     void persistPractice();
-    void buildTray();
-    void updateTray();
     /// Pausa (sin reiniciar) lo que esté sonando: la sesión si corre, o el motor.
     void pausePlayback();
 
@@ -57,7 +54,6 @@ private:
     PhaseChime *chime_ = nullptr;
     SleepInhibitor *inhibitor_ = nullptr;
     QMediaDevices *devices_ = nullptr;
-    QSystemTrayIcon *tray_ = nullptr;
 
     TempoPanel *tempo_ = nullptr;
     QTabWidget *tabs_ = nullptr;

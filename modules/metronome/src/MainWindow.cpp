@@ -18,8 +18,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QMediaDevices>
-#include <QMenu>
-#include <QSystemTrayIcon>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QShortcut>
@@ -45,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     buildUi();
     buildShortcuts();
-    buildTray();
 
     connect(engine_, &MetronomeEngine::configChanged, this, &MainWindow::onConfigChanged);
     connect(engine_, &MetronomeEngine::runningChanged, this, &MainWindow::updatePlayButton);
@@ -154,7 +151,6 @@ void MainWindow::buildShortcuts()
 
 void MainWindow::onConfigChanged()
 {
-    updateTray();
     tempo_->refresh();
     metronomeTab_->refresh();
     practiceTab_->refreshConfig();
@@ -188,7 +184,6 @@ void MainWindow::updatePlayButton()
     tempo_->setPlaying(playing);
     tempo_->refresh();
     inhibitor_->setActive(playing && settings_->keepAwake());
-    updateTray();
 }
 
 void MainWindow::pausePlayback()
@@ -197,40 +192,6 @@ void MainWindow::pausePlayback()
         session_->toggle();
     else
         engine_->stop();
-}
-
-void MainWindow::buildTray()
-{
-    if (!QSystemTrayIcon::isSystemTrayAvailable())
-        return;
-    tray_ = new QSystemTrayIcon(QApplication::windowIcon(), this);
-    auto *menu = new QMenu(this);
-    menu->addAction(txt("Tocar / pausar", "Play / pause", "Lecture / pause"), this, &MainWindow::togglePlayback);
-    menu->addAction(txt("Mostrar Metrodoro", "Show Metrodoro", "Afficher Metrodoro"), this, [this]()
-                    {
-                        setWindowState(windowState() & ~Qt::WindowMinimized);
-                        show();
-                        raise();
-                        activateWindow(); });
-    menu->addSeparator();
-    menu->addAction(txt("Salir", "Quit", "Quitter"), qApp, &QApplication::quit);
-    tray_->setContextMenu(menu);
-    connect(tray_, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason)
-            {
-                if (reason == QSystemTrayIcon::Trigger)
-                    togglePlayback(); });
-    tray_->show();
-    updateTray();
-}
-
-void MainWindow::updateTray()
-{
-    if (!tray_)
-        return;
-    const bool playing = engine_->running() || session_->running();
-    tray_->setToolTip(QStringLiteral("Metrodoro — %1 BPM%2")
-                          .arg(engine_->shownBpm())
-                          .arg(playing ? QString() : txt(" (en pausa)", " (paused)", " (en pause)")));
 }
 
 void MainWindow::togglePlayback()
